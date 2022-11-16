@@ -1,0 +1,25 @@
+{% if cat %}
+
+<input list="catlist" type="text" class="form-control" name="cat" id="cat" required>
+<label for="cat">Search Category to apply Offer</label>
+
+<datalist id="catlist">
+    {% for c in cat %}
+    <option value="{{ c.category }}">
+    {% endfor %}
+</datalist>
+
+{% endif %}
+
+{% if p %}
+
+<input list="pdtlist" type="text" class="form-control" name="pdt" id="pdt" required>
+<label for="pdt">Search Product to apply Offer</label>
+
+<datalist id="pdtlist">
+    {% for pdt in p %}
+    <option value="{{ pdt.name }}">
+    {% endfor %}
+</datalist>
+
+{% endif %}

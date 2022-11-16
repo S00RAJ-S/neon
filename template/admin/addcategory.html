@@ -1,0 +1,23 @@
+{% extends 'admin/base.html' %}
+{% block addcat %}
+active
+{% endblock %}
+
+{% block content %}
+
+<center>
+    <div class="container" style="width: 60%;">
+        <h3 class="my-5"><u>Add Categories</u></h3>
+        <form method="post" id="addcat">
+            {% csrf_token %}
+            <div class="form-floating mb-3 mt-5">
+                <input type="text" class="form-control" name="category" id="floatingInput" placeholder="Laptop"
+                    required>
+                <label for="floatingInput">Category</label>
+                <button type="submit" onclick="" class="btn btn-primary mt-5">Add</button>
+            </div>
+        </form>
+    </div>
+</center>
+
+{% endblock %}

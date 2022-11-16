@@ -1,0 +1,83 @@
+<script>
+    // function reduce() {
+    //     $('.qtyreduce').submit(function (e) {
+    //         e.preventDefault();
+    //         swal({
+    //             title: "Are you sure?",
+    //             icon: "warning",
+    //             buttons: true,
+    //             dangerMode: true,
+    //         })
+    //             .then((willDelete) => {
+    //                 if (willDelete) {
+    //                     swal("kjhk")
+    //                     $(this).unbind('submit').submit()
+    //                 }
+    //             });
+    //     });
+    // }
+</script>
+
+
+    function increase(btnid,pdtid) {
+        pdid = $(pdtid).val()
+        $(btnid).click(function(pdid){
+            $.ajax({
+                url: '/user/updateqty/',
+                    type: 'POST',
+                    data: {
+                        'pdtid': pdid,
+                        'o': '0',
+                        csrfmiddlewaretoken: '{{ csrf_token}}',
+                    },
+                    success: function (r) {
+                        $('#qty').val(r.qty)
+                    },
+                    error: function (r) {
+                        swal("Error")
+                    }
+                });            
+        })
+    }
+    $(document).ready(function () {
+
+        // $('#qtyreduce').submit(function (e) {
+        //     e.preventDefault()
+        //     $('#qty').val()
+        //     $('#pdtid').val()
+        //     console.log(
+        //         $('#qty').val(),
+        //     $('#pdtid').val()
+        //     )
+
+        //     swal("lakdjsfljs")
+        // })
+
+        // $('#qtyincrease').submit(function (e) {
+        //     e.preventDefault()
+        //     console.log("lkajsdhfklsd")
+
+        //     swal("lakdjsfljs")
+        // })
+
+        // $('#reduce').click(function () {
+        //     console.log($('#qty').val())
+        //     $.ajax({
+        //         url: '/user/updateqty/',
+        //         type: 'POST',
+        //         data: {
+        //             'qty': $('#qty').val(),
+        //             'pdtid': $('#pdtid').val(),
+        //             'o': '0',
+        //             csrfmiddlewaretoken: '{{ csrf_token}}',
+        //         },
+        //         success: function (r) {
+        //             $('#qty').val(r.qty)
+        //         },
+        //         error: function (r) {
+        //             swal("Error")
+        //         }
+        //     });
+
+        // })
+    })

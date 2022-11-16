@@ -1,0 +1,85 @@
+{% extends 'admin/base.html' %}
+
+{% block viewusers %}
+active
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-sm-12 col-xl-12">
+    <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Users Registered With Us</h6>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        <form action="/admin/viewusers/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="usort" value="name" hidden>
+                            <button type="submit" style="border: none;background:none;"
+                                title="Filter With Email">Name</button>
+                        </form>
+                    </th>
+                    <th scope="col">
+                        <form action="/admin/viewusers/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="usort" value="email" hidden>
+                            <button type="submit" style="border: none;background:none;"
+                                title="Filter With Email">Email</button>
+                        </form>
+                    </th>
+                    <th scope="col">
+                        <form action="/admin/viewusers/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="usort" value="phone" hidden>
+                            <button type="submit" style="border: none;background:none;" title="Filter With Email">Phone
+                                Number</button>
+                        </form>
+                    </th>
+                    <th scope="col">
+                        <form action="/admin/viewusers/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="usort" value="blocked" hidden>
+                            <button type="submit" style="border: none;background:none;"
+                                title="Filter With Email">Block/Unblock</button>
+                        </form>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in data %}
+                <tr>
+                    <td class="pt-4">{{ i.name }}</td>
+                    <td class="pt-4">{{ i.email }}</td>
+                    <td class="pt-4">{{ i.phone }}</td>
+                    {% if i.blocked == 'F' %}
+                    <td>
+                        <form action="/admin/blockuser/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="uid" value="{{ i.id }}" hidden>
+                            <button type="submit" onclick="return confirm('Are You Sure')"
+                                class="btn btn-success m-2">Block</button>
+                        </form>
+                    </td>
+                    {% else %}
+                    <td>
+                        <form action="/admin/unblockuser/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="uid" value="{{ i.id }}" hidden>
+                            <button type="submit" onclick="return confirm('Are You Sure')" class="btn btn-danger m-2">
+                                UnBlock</button>
+                        </form>
+                    </td>
+                    {% endif %}
+
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

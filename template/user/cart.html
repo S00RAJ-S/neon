@@ -1,0 +1,283 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}
+Neon | Cart
+{% endblock %}
+
+{% block username %}
+{% if name %}
+<li class="submenu">
+    <a href="javascript:;"><b>{{ name }}</b></a>
+    <ul>
+        <li><a href="/user/profile/">Profile</a></li>
+        <li><a href="/user/myaddress/">My Address</a></li>
+        <li><a href="/user/myorders/">Orders</a></li>
+        <li><a href="/user/wishlist/">Wishlist</a></li>
+        <li><a rel="nofollow" href="/logout/">Logout</a></li>
+    </ul>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block categoriesdisplay %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    @media (max-width:768px) {
+        .carousel-inner img{
+            width: 150px !important;
+            height: 150px !important;
+        }
+
+        .cartpdt button{
+            padding: 2px !important;
+            font-size: small;
+        }
+
+        .cartpdt h3{
+            font-size: x-large;
+
+        }
+
+        .cartpdt h4{
+            font-size: large;
+
+        }
+
+        .cartpdt p{
+            font-size: smaller;
+        }
+        
+    }
+
+    @media (max-width:576) {
+        
+        
+    }
+</style>
+
+<div class="container row mx-auto" style="margin:8rem 0rem;width: max-content;">
+
+    <div class="container col-md-7 col-lg-8">
+
+            {% for wlist in w %}
+            <div class="row"
+                style="background-color: rgb(241, 240, 237);padding:2%;font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+                <div id="ProductImgControl" class="carousel slide col-2 col-sm-4 col-md-4" data-ride="carousel"
+                    style="overflow: none;">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="/media/{{ wlist.pid.img1 }}" class="d-block w-100" style="object-fit: scale-down;" width="250px" height="250px" alt="...">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/media/{{ wlist.pid.img2 }}" class="d-block w-100" style="object-fit: scale-down;" width="250px" height="250px" alt="...">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/media/{{ wlist.pid.img3 }}" class="d-block w-100" style="object-fit: scale-down;" width="250px" height="250px" alt="...">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="/media/{{ wlist.pid.img4 }}" class="d-block w-100" style="object-fit: scale-down;" width="250px" height="250px" alt="...">
+                        </div>
+                    </div>
+                </div>
+                <div class="cartpdt col-3 col-sm-6 col-md-6 ml-5">
+                    <div class="d-flex justify-content-end">
+                        <form id="delcat" class="delcart" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="delid" value="{{ wlist.id }}" hidden>
+                            <button type="submit" onclick="return confirmation()" class="btn m-2 px-4"
+                                style="background-color: #FB641B;color:white;">
+                                Remove</button>
+                        </form>
+                    </div>
+                    <h3><a href="/user/product/{{ wlist.pid.id }}/">{{ wlist.pid.name }}</a></h3>
+                    <h4 class="my-4">
+                        {% if wlist.pid.calcofferprice %}
+                        <strike style="color: red;">
+                            ₹{{ wlist.pid.price }}  
+                        </strike>
+                        <div style="color: green;">
+                            ₹{{ wlist.pid.calcofferprice }} 
+                        </div>
+                        {% else %}
+                        ₹{{ wlist.pid.price }}  
+                        {% endif %}
+
+                    </h4>
+                    {% if wlist.pid.stock < 11 and wlist.pid.stock > 1  %} <h4 class="my-4 text-danger">Few Stocks left Hurry Up!!</h4>
+                    {% endif %}
+                    {% if wlist.pid.stock < 1 %} <h4 class="my-4 text-danger">Out of Stock</h4>
+                    {% endif %}
+
+                        <div class="d-flex">
+
+
+                            <button id="reduce{{forloop.counter}}" type="submit" class="px-2"
+                                style="border: 1px solid black;"
+                                onclick="reduce(qty{{forloop.counter}},{{ wlist.id }})">-</button>
+
+
+                            <input class="text-center mx-2" type="number" id="qty{{forloop.counter}}"
+                                value="{{ wlist.quantity }}" style="width: 15%;" readonly>
+
+                            <button id="increase{{forloop.counter}}" type="submit" class="px-2"
+                                style="border: 1px solid black;"
+                                onclick="increase(qty{{forloop.counter}},{{ wlist.id }})">+</button>
+
+                        </div>
+
+                        <p>Ram:{{ wlist.pid.ram }}</p>
+                        <p>Rom:{{ wlist.pid.rom }}</p>
+                        <p>Display:{{ wlist.pid.display }}</p>
+                </div>
+            </div>
+            <hr>
+            {% endfor %}
+
+    </div>
+
+    <div class="col-md-5 col-lg-4 p-5" style="height: max-content;box-shadow: 0.5px 1px 2px 1px rgba(83, 183, 245, 0.8);">
+        <h4 class="mb-4">Price Details</h4>
+        <table class="table table-borderless">
+            <tr>
+                <td>Price</td>
+                <td class="text-right" id="price">₹{{ price }}</td>
+            </tr>
+            <tr>
+                <td>Shipping Charges</td>
+                <td class="text-right" id="s">₹{{ s }}</td>
+            </tr>
+            <tr style="border-top: 2px solid black;">
+                <td>Total Cart value</td>
+                <td class="text-right" id="total">₹{{ total }}</td>
+            </tr>
+        </table>
+        <small>* Shipping Charges Free If order value is greater than ₹500</small><br>
+
+        <div class="container mx-5 mt-3">
+            <a class="btn"
+                style="background-color: #FF9F00;font-family: cursive;color: white;font-weight: bolder;padding: 5%;"
+                onclick="cei()">Checkout</a>
+        </div>
+
+        <hr style="border: 2px solid black;" class="mt-4">
+        <div>
+            <h6>Available Coupens</h6>
+            <ul>
+            {% for c in coupens %}
+            <li style="list-style-type: circle;background-color: rgb(213, 208, 208);font-family: Georgia, 'Times New Roman', Times, serif;" class="p-2" >
+                Use Code <strong>{{ c.code }}</strong> and get {{ c.discount }}% discount Upto ₹{{ c.discount_limit }}
+            </li>
+            {% endfor %}
+            </ul>
+            <small>*Use the Coupen Code in the next checkout page to aval discount</small>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script>
+
+    function reduce(qty, cartid) {
+        $.ajax({
+            url: '/user/updateqty/',
+            type: 'POST',
+            data: {
+                'pdtid': cartid,
+                'o': '0',
+                csrfmiddlewaretoken: '{{ csrf_token}}',
+            },
+            success: function (r) {
+                $(qty).val(r.qty)
+                $('#price').text('₹' + r.price)
+                p = r.s + r.price
+                $('#s').text('₹' + r.s)
+                $('#total').text('₹' + p)
+            },
+            error: function (r) {
+                swal("Out Of Stock")
+            }
+        });
+    }
+
+    function increase(qty, cartid) {
+        $.ajax({
+            url: '/user/updateqty/',
+            type: 'POST',
+            data: {
+                'pdtid': cartid,
+                'o': '1',
+                csrfmiddlewaretoken: '{{ csrf_token}}',
+            },
+            success: function (r) {
+                $(qty).val(r.qty)
+                $('#price').text('₹' + r.price)
+                p = r.s + r.price
+                $('#s').text('₹' + r.s)
+                $('#total').text('₹' + p)
+            },
+            error: function (r) {
+                swal("Out Of Stock")
+            }
+
+        });
+
+    }
+
+
+    function cei(){
+        $.ajax({
+            url:'/user/cei/',
+            type: 'POST',
+            data:{
+                csrfmiddlewaretoken:'{{ csrf_token }}'
+            },
+            success:function(){
+                location.href = '/user/checkout/'
+            },
+            error:function(){
+                swal("Cart contains Out of Stock Item, Remove Then and proceed")
+            }
+        })
+    }
+
+
+    function confirmation() {
+        $('.delcart').submit(function (ev) {
+
+            ev.preventDefault();
+            swal({
+                title: "Are you sure?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $('.delcart').attr('action', '/user/delcart/');
+                        $(this).unbind('submit').submit()
+                    }
+                });
+        });
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+{% endblock %}

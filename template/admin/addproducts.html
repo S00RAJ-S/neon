@@ -1,0 +1,110 @@
+{% extends 'admin/base.html' %}
+
+{% block addproduct %}
+active
+{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-12 col-xl-6">
+    <div class="bg-light rounded h-100 p-4">
+        <h3 class="mb-4">Add Products</h3>
+        <form action="/admin/addproducts/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+                <input type="text" name="name" class="form-control" id="floatingInput" required>
+                <label for="floatingInput">Name of Product</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="brand" class="form-control" id="floatingInput" required>
+                <label for="floatingInput">Brand</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="model" class="form-control" id="floatingInput" required>
+                <label for="floatingInput">Model</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="number" name="price" class="form-control" id="floatingPassword" required>
+                <label for="floatingPassword">Price</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <select class="form-select" name="category" id="categories" aria-label="Floating label select example">
+                    <option selected>Open this select menu</option>
+                    {% for i in categories %}
+                    <option value="{{ i.id }}">{{ i.category }}</option>
+                    {% endfor %}
+                </select>
+                <label for="categories">Category</label>
+            </div>
+
+            <div class="form-floating mb-3" id="subcategory" style="display: none;">
+
+                <!-- subcategory section Ajax Jquery-->
+
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="ram" class="form-control" id="floatingInput">
+                <label for="floatingInput">RAM</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="rom" class="form-control" id="floatingInput">
+                <label for="floatingInput">ROM</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="processor" class="form-control" id="floatingInput">
+                <label for="floatingInput">Processor</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="display" class="form-control" id="floatingInput">
+                <label for="floatingInput">Display</label>
+            </div>
+
+            <div class="form-floating">
+                <textarea class="form-control" name="spec" placeholder="Leave a comment here" id="floatingTextarea"
+                    style="height: 150px;"></textarea>
+                <label for="floatingTextarea">Specifications</label>
+            </div>
+
+            <div class="my-3">
+                <p>Upload image of the Product</p>
+                <ol>
+                    <li><input name="img1" class="form-control my-2" type="file" id="img1"></li>
+                    <li><input name="img2" class="form-control my-2" type="file" id="img2"></li>
+                    <li><input name="img3" class="form-control my-2" type="file" id="img3"></li>
+                    <li><input name="img4" class="form-control my-2" type="file" id="img4"></li>
+                </ol>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="number" name="stock" class="form-control" id="floatingPassword" required>
+                <label for="floatingPassword">Stock</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary m-2">Add Product</button>
+    </div>
+    </form>
+</div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#categories').change(function () {
+            var catid = $('#categories').val()
+            $('#subcategory').load("/admin/matchingsubcategory/" + catid)
+            $('#subcategory').css('display', 'block')
+        });
+
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block lp %}
+
+{% endblock %}
+{% block categoriesdisplay %}
+
+{% endblock %}
+
+{% block landingpagenav %}
+<li class="scroll-to-section d-none d-xl-block">
+    <form class="form-inline" id="searchform" method="get" action="/user/query/">
+        <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search"
+            aria-label="Search" id="searchinput">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+</li>
+<li class="scroll-to-section"><a href="/login/" class="active">Login</a></li>
+<li class="scroll-to-section"><a href="/user/signup/" class="active">Signup</a></li>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<!-- ***** Main Banner Area Start ***** -->
+<div class="main-banner" id="top">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for bimg in banner %}
+                    <div class="carousel-item">
+                        <img src="/media/{{ bimg.img }}" class="d-block w-100" alt="...">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ***** Main Banner Area End ***** -->
+
+<!-- ***** Category wise product list Starts ***** -->
+
+{% for c in categories %}
+<section class="section" id="men">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="section-heading">
+                    <h2 id="{{ c.category }}">{{ c.category }}</h2>
+                    <!-- <span>Details to details is what makes Hexashop different from the other themes.</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Product Iteration ***** -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="men-item-carousel">
+                    <div class="owl-men-item owl-carousel">
+                        {% for p in products %}
+                        {% if p.category_id_id == c.id %}
+                        <div class="item">
+                            <div class="thumb">
+                                <div class="hover-content">
+                                    <ul>
+                                        <li><a href="/user/product/{{ p.id }}"><i class="fa fa-eye"></i></a></li>
+                                        <li><a href="/user/wishlist/{{ p.id }}"><i class="fa fa-star"></i></a></li>
+                                        <li><a href="/user/cart/{{ p.id }}"><i class="fa fa-shopping-cart"></i></a></li>
+                                    </ul>
+                                </div>
+                                <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <img class="d-block w-100" src="/media/{{ p.img1 }}" alt="First slide" style="object-fit: scale-down;" width="250px" height="250px">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-100" src="/media/{{ p.img2 }}" alt="Second slide" style="object-fit: scale-down;" width="250px" height="250px">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-100" src="/media/{{ p.img3 }}" alt="Third slide" style="object-fit: scale-down;" width="250px" height="250px">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-100" src="/media/{{ p.img4 }}" alt="Third slide" style="object-fit: scale-down;" width="250px" height="250px">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="down-content">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb" style="background-color: white;">
+                                        <li class="breadcrumb-item">{{ p.category_id.category }}</li>
+                                        <li class="breadcrumb-item">{{ p.subcategory_id.subcategory }}</li>
+                                    </ol>
+                                </nav>
+                                <h4>{{ p.name }}</h4>
+                                <span>₹{{ p.price }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Product Iteration ***** -->
+</section>
+{% endfor %}
+<!-- ***** Category wise product list Ends ***** -->
+
+<!-- ***** Explore Area Starts ***** -->
+<!-- <section class="section" id="explore">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="left-content">
+                    <h2>Explore Our Products</h2>
+                    <span>You are allowed to use this HexaShop HTML CSS template. You can feel free to modify or edit
+                        this layout. You can convert this template as any kind of ecommerce CMS theme as you
+                        wish.</span>
+                    <div class="quote">
+                        <i class="fa fa-quote-left"></i>
+                        <p>You are not allowed to redistribute this template ZIP file on any other website.</p>
+                    </div>
+                    <p>There are 5 pages included in this HexaShop Template and we are providing it to you for
+                        absolutely free of charge at our TemplateMo website. There are web development costs for us.</p>
+                    <p>If this template is beneficial for your website or business, please kindly <a rel="nofollow"
+                            href="https://paypal.me/templatemo" target="_blank">support us</a> a little via PayPal.
+                        Please also tell your friends about our great website. Thank you.</p>
+                    <div class="main-border-button">
+                        <a href="products.html">Discover More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="right-content">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="leather">
+                                <h4>Leather Bags</h4>
+                                <span>Latest Collection</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="first-image">
+                                <img src="assets/images/explore-image-01.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="second-image">
+                                <img src="assets/images/explore-image-02.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="types">
+                                <h4>Different Types</h4>
+                                <span>Over 304 Products</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> -->
+<!-- ***** Explore Area Ends ***** -->
+
+<!-- ***** Social Area Starts ***** -->
+<!-- <section class="section" id="social">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-heading">
+                    <h2>Social Media</h2>
+                    <span>Details to details is what makes Hexashop different from the other themes.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row images">
+            <div class="col-2">
+                <div class="thumb">
+                    <div class="icon">
+                        <a href="http://instagram.com">
+                            <h6>Fashion</h6>
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <img src="assets/images/instagram-01.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="thumb">
+                    <div class="icon">
+                        <a href="http://instagram.com">
+                            <h6>New</h6>
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <img src="assets/images/instagram-02.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="thumb">
+                    <div class="icon">
+                        <a href="http://instagram.com">
+                            <h6>Brand</h6>
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <img src="assets/images/instagram-03.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="thumb">
+                    <div class="icon">
+                        <a href="http://instagram.com">
+                            <h6>Makeup</h6>
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <img src="assets/images/instagram-04.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="thumb">
+                    <div class="icon">
+                        <a href="http://instagram.com">
+                            <h6>Leather</h6>
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <img src="assets/images/instagram-05.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="thumb">
+                    <div class="icon">
+                        <a href="http://instagram.com">
+                            <h6>Bag</h6>
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <img src="assets/images/instagram-06.jpg" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+</section> -->
+<!-- ***** Social Area Ends ***** -->
+
+<!-- ***** Subscribe Area Starts ***** -->
+<!-- <div class="subscribe">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="section-heading">
+                    <h2>By Subscribing To Our Newsletter You Can Get 30% Off</h2>
+                    <span>Details to details is what makes Hexashop different from the other themes.</span>
+                </div>
+                <form id="subscribe" action="" method="get">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <fieldset>
+                                <input name="name" type="text" id="name" placeholder="Your Name" required="">
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-5">
+                            <fieldset>
+                                <input name="email" type="text" id="email" pattern="[^ @]*@[^ @]*"
+                                    placeholder="Your Email Address" required="">
+                            </fieldset>
+                        </div>
+                        <div class="col-lg-2">
+                            <fieldset>
+                                <button type="submit" id="form-submit" class="main-dark-button"><i
+                                        class="fa fa-paper-plane"></i></button>
+                            </fieldset>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-4">
+                <div class="row">
+                    <div class="col-6">
+                        <ul>
+                            <li>Store Location:<br><span>Sunny Isles Beach, FL 33160, United States</span></li>
+                            <li>Phone:<br><span>010-020-0340</span></li>
+                            <li>Office Location:<br><span>North Miami Beach</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul>
+                            <li>Work Hours:<br><span>07:30 AM - 9:30 PM Daily</span></li>
+                            <li>Email:<br><span>info@company.com</span></li>
+                            <li>Social Media:<br><span><a href="#">Facebook</a>, <a href="#">Instagram</a>, <a
+                                        href="#">Behance</a>, <a href="#">Linkedin</a></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- ***** Subscribe Area Ends ***** -->
+
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#carouselExampleSlidesOnly').find('.carousel-item').first().addClass('active');
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+{% endblock %}

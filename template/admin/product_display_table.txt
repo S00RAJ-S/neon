@@ -1,0 +1,69 @@
+<div class="col-sm-12 col-xl-12">
+    <div class="bg-light rounded h-100 p-4">
+        <h5 class="mb-4">Products</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        Name
+                    </th>
+                    <th scope="col">
+                        Brand
+                    </th>
+                    <th scope="col">
+                        Model
+                    </th>
+                    <th scope="col">
+                        Price
+                    </th>
+                    <th scope="col">
+                        Category
+                    </th>
+                    <th scope="col">
+                       Sub Category
+                    </th>
+                    <th scope="col">
+                        Description 
+                    </th>
+                    <th scope="col">
+                        Images
+                    </th>
+                    <th scope="col">
+                        Stock
+                    </th>
+                    <th scope="col">
+                        Delete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in data %}
+                <tr>
+                    <td class="pt-4">{{ i.name }}</td>
+                    <td class="pt-4">{{ i.brand }}</td>
+                    <td class="pt-4">{{ i.model_number }}</td>
+                    <td class="pt-4">₹{{ i.price }}</td>
+                    <td class="pt-4">{{ i.category_id.category }}</td>
+                    <td class="pt-4">{{ i.subcategory_id.subcategory }}</td>
+                    <td class="pt-4">{{ i.description }}</td>
+                    <td class="pt-4"><img src="/media/{{ i.img1 }}" alt="" width="150rem" height="100rem"></td>
+                    <td>
+                        <form action="/admin/editproducts/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="pid" value="{{ i.id }}" hidden>
+                            <button type="submit" onclick="return confirm('Are You Sure')" class="btn btn-success m-2">
+                                Edit</button>
+                        </form>
+                        <form action="/admin/products/" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="pid" value="{{ i.id }}" hidden>
+                            <button type="submit" onclick="return confirm('Are You Sure')" class="btn btn-danger m-2">
+                                Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

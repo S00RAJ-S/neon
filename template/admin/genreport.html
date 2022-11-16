@@ -1,0 +1,48 @@
+{% if orders %}
+<table class="mx-auto my-5">
+    <tr style="background-color: #2F71C1;color: white;">
+        <td>
+            Item
+        </td>
+        <td>
+            Price
+        </td>
+        <td>
+            Quantity
+        </td>
+        <td>
+            Sub total
+        </td>
+        <td>
+            Payment Method
+        </td>
+        <td>
+            Payment Id
+        </td>
+
+    </tr>
+    <!-- Looping Products-->
+    {% for o in orders %}
+
+    <tr style="background-color: #F2F6F8;color: balck;">
+        <td>{{ o.pid.name }}</td>
+        <td> Rs. {{ o.pid.price }}</td>
+        <td width="8%">{{ o.quantity }}</td>
+        <td> Rs. {{ o.pid.price }}</td>
+        <td>
+            {{ o.paymentMethod }}
+        </td>
+        <td width="25%">
+            {{ o.paymentId }}
+        </td>
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+<h5 class="text-danger m-3">
+    No Records Found
+</h5>
+{% endif %}

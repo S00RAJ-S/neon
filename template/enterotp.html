@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <title>Login with OTP</title>
+
+    <style>
+        @media only screen and (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .mx-3 {
+                margin: 0 !important;
+                width: 1.8rem !important;
+                height: 3rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container my-5" style="box-shadow: 3px 4px 5px 3px rgba(0, 0, 0, 0.5);height:85vh;width: 60%;">
+        <h1 class="text-center my-5 pt-5 pb-3">Enter OTP</h1>
+        <center>
+            <div class="container">
+                <form action="/valadatingotp/" method="post" id="otp">
+                    {% csrf_token %}
+                    <input type="text" name="otp1" id="otp1" style="height:4.5rem;width:4rem;" class="mx-3 text-center"
+                        oninput="gotonext('otp2')">
+                    <input type="text" name="otp2" id="otp2" style="height:4.5rem;width:4rem;" class="mx-3 text-center"
+                        oninput="gotonext('otp3')">
+                    <input type="text" name="otp3" id="otp3" style="height:4.5rem;width:4rem;" class="mx-3 text-center"
+                        oninput="gotonext('otp4')">
+                    <input type="text" name="otp4" id="otp4" style="height:4.5rem;width:4rem;"
+                        class="mx-3 text-center"><br>
+                    <button type="submit" class="btn btn-primary my-5">Login</button>
+                </form>
+                <a id="otptimer"> Resend OTP in <span id="countdowntimer">5 </span> Minutes</a>
+                <script>
+                    //Resend OTP function
+                    var timeleft = 5;
+                    var downloadTimer = setInterval(function () {
+                        timeleft--;
+                        document.getElementById("countdowntimer").textContent = timeleft;
+                        if (timeleft <= 0){
+                            clearInterval(downloadTimer);
+                            $('#otptimer').text('Resend OTP')
+                            $('#otptimer').attr('href','/lotp/')
+                        }
+                    }, 1000);
+                </script>
+            </div>
+        </center>
+    </div>
+    <script>
+        function gotonext(gotoid) {
+            document.getElementById(gotoid).focus()
+        }
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

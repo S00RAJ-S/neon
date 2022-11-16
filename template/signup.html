@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title Page-->
+    <title>Register with us</title>
+
+    <!-- Icons font CSS-->
+    <link href="{% static 'signup/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet"
+        media="all">
+    <link href="{% static 'signup/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+    <!-- Font special for pages-->
+    <link
+        href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS-->
+    <link href="{% static 'signup/vendor/select2/select2.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'signup/vendor/datepicker/daterangepicker.css' %}" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="{% static 'signup/css/main.css' %}" rel="stylesheet" media="all">
+    <style>
+        #gotologin a{
+            text-decoration: none;
+            color: black;
+        }
+        #gotologin a:hover{
+            color:rgb(61, 203, 61);
+        }
+        @media (max-width: 426px ){
+            #gotologin{
+                padding-left:50% !important;
+                font-size: 90% !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+        <strong>{{ msg }}</strong>
+        {% endfor %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %}
+    <div class="page-wrapper bg-gra-02 p-t-100 p-b-100 font-poppins">
+        <div class="wrapper wrapper--w680">
+            <div class="card card-4">
+                <div class="text-right p-t-136" id="gotologin" style="padding: 3% 1% 1% 70%;">
+                    <a class="txt2" href="/login/">
+                        Already Have Account
+                        <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <h2 class="title">Registration Form</h2>
+                    <form method="POST" id="signupform">
+                        {% csrf_token %}
+                        <div class="row row-space">
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <label class="label">Name</label>
+                                    <input class="input--style-4" type="text" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <label class="label">Phone Number</label>
+                                    <input class="input--style-4" oninput="phonevalidation()" id="Phone" type="number" name="phone" required>
+                                    <div id="phvm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <label class="label">Email</label>
+                                    <input class="input--style-4"  id="Email" oninput="emailvalidation()" type="email" name="email" required>
+                                    <div id="evm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <label class="label">Password</label>
+                                    <input class="input--style-4" oninput="passvalidation()" id="Password" type="password" name="password" required>
+                                    <div id="pvm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-t-15">
+                            <button class="btn btn--radius-2 btn--blue" type="submit" onclick="signupvalidation()" >Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="{% static 'signup/vendor/jquery/jquery.min.js' %} "></script>
+    <!-- Vendor JS-->
+    <script src="{% static 'signup/vendor/select2/select2.min.js' %}"></script>
+    <script src="{% static 'signup/vendor/datepicker/moment.min.js' %}"></script>
+    <script src="{% static 'signup/vendor/datepicker/daterangepicker.js' %}"></script>
+
+    <!-- Main JS-->
+    <script src="{% static 'signup/js/global.js' %}"></script>
+    <script src="{% static 'validations.js' %}"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+
+</html>
+<!-- end document-->

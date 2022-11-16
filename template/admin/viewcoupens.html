@@ -1,0 +1,81 @@
+{% extends 'admin/base.html' %}
+{% block viewcoupen %}
+active
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-sm-12 col-xl-12">
+    <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Categories</h6>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        Coupen Code
+                    </th>
+                    <th scope="col">
+                        Discount Percentage
+                    </th>
+                    <th scope="col">
+                        Maximum Discount Limit
+                    </th>
+                    <th scope="col">
+                        Minimum Purchase Amount
+                    </th>
+                    <th scope="col">
+                        Delete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in coupen %}
+                <tr>
+                    <td class="pt-4">{{ i.code }}</td>
+                    <td class="pt-4">{{ i.discount }}</td>
+                    <td class="pt-4">{{ i.discount_limit }}</td>
+                    <td class="pt-4">{{ i.min_purchase_amt }}</td>
+                    <td>
+                        <form id="delcoupen" class="delcoupen" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="cid" value="{{ i.id }}" hidden>
+                            <button type="submit" onclick="return confirmation()" class="btn btn-danger m-2">
+                                Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<!--Sweet alert for asking confirmation to delete-->
+<script>
+    function confirmation() {
+        $('.delcoupen').submit(function (ev) {
+
+            ev.preventDefault();
+            swal({
+                title: "Are you sure?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        // document.getElementsByClassName('delcat').action = "/admin/delcategory/"
+                        $('.delcoupen').attr('action', '/admin/delcoupen/');
+                        $(this).unbind('submit').submit()
+                    }
+                });
+        });
+        // $(this).unbind('submit').submit()
+
+    }
+</script>
+
+{% endblock %}

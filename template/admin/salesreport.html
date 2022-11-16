@@ -1,0 +1,82 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block salesreport %}
+active
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+<link rel="stylesheet" href="{% static 'cropper.min.css' %} ">
+<script src="{% static 'cropper.min.js' %}"></script>
+
+
+<div>
+    <h4 class="m-5">Select a Date Range to generate Sales Report</h4>
+    <div class="d-flex justify-content-around mx-5 my-3">
+        <div>
+            <label for="from">From:</label>
+            <input type="date" id="from">
+        </div>
+        <div>
+            <label for="to">To:</label>
+            <input type="date" id="to">
+        </div>
+    </div>
+    <div class="d-flex">
+        <button class="btn btn-primary mx-auto w-50" id="fetchbtn">Fetch</button>
+    </div>
+    <div id="salesreport">
+        <!-- To Display sales Report-->
+    </div>
+</div>
+
+<script>
+
+    $("#fetchbtn").click(function(){
+        var fromdate = $("#from").val()
+        var todate = $("#to").val()
+        if(fromdate.length == 0){
+            swal({
+                icon:'warning',
+                title:"Select From Date"
+            })
+        }
+        else if(todate.length == 0){
+            swal({
+                icon:'warning',
+                title:"Select To Date"
+            })
+        }
+        else if(fromdate && todate){
+            $("#salesreport").load('/admin/genreport/?from='+fromdate+'&to='+todate)
+        }
+    })
+
+
+    function confirmation() {
+        $('.delbanner').submit(function (e) {
+            e.preventDefault();
+            swal({
+                title: "Are you sure?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $('.delbanner').attr('action', '/admin/deletebanner/')
+                        $(this).unbind('submit').submit()
+                    }
+                });
+
+        })
+    }
+</script>
+{% endblock %}

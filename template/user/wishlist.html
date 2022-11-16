@@ -1,0 +1,101 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}
+Neon | Wishlist
+{% endblock %}
+
+{% block username %}
+{% if name %}
+<li class="submenu">
+    <a href="javascript:;"><b>{{ name }}</b></a>
+    <ul>
+        <li><a href="/user/profile/">Profile</a></li>
+        <li><a href="/user/myaddress/">My Address</a></li>
+        <li><a href="/user/myorders/">Orders</a></li>
+        <li><a href="/user/wishlist/">Wishlist</a></li>
+        <li><a rel="nofollow" href="/logout/">Logout</a></li>
+    </ul>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block categoriesdisplay %}
+{% endblock %}
+
+{% block content %}
+
+<section class="section" style="display: block; margin:8rem 4rem;">
+    <div class="container">
+        {% for wlist in w %}
+        <div class="row" style="background-color: rgb(244, 239, 239);padding:2%;">
+            <div id="ProductImgControl" class="carousel slide col-lg-4" data-ride="carousel" style="overflow: none;">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/media/{{ wlist.pid.img1 }}" class="d-block" alt="..." style="height: 350px; width: 250px;">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/media/{{ wlist.pid.img2 }}" class="d-block" alt="..." style="height: 350px; width: 250px;">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/media/{{ wlist.pid.img3 }}" class="d-block" alt="..." style="height: 350px; width: 250px;">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/media/{{ wlist.pid.img4 }}" class="d-block" alt="..." style="height: 350px; width: 250px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 ml-5">
+                <div class="d-flex justify-content-end">
+                    <form id="delcat" class="delcat" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="delid" value="{{ wlist.id }}" hidden>
+                        <button type="submit" onclick="return confirmation()" class="btn btn-danger m-2">
+                            Delete</button>
+                    </form>
+                </div>
+                <h3><a href="/user/product/{{ wlist.pid.id }}"> {{ wlist.pid.name }} </a></h3>
+                <h4 class="my-4">₹{{ wlist.pid.price }}</h4>
+                <p>Ram:{{ wlist.pid.ram }}</p>
+                <p>Rom:{{ wlist.pid.rom }}</p>
+                <p>Display:{{ wlist.pid.display }}</p>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmation() {
+        $('.delcat').submit(function (ev) {
+
+            ev.preventDefault();
+            swal({
+                title: "Are you sure?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        // document.getElementsByClassName('delcat').action = "/admin/delcategory/"
+                        $('.delcat').attr('action', '/user/delwishlist/');
+                        $(this).unbind('submit').submit()
+                    }
+                });
+        });
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
+{% endblock %}

@@ -1,0 +1,7 @@
+<select class="form-select" name="subcategory" id="subcategories" aria-label="Floating label select example">
+    <option selected>Open this select menu</option>
+    {% for i in subcategories %}
+    <option value="{{ i.id }}">{{ i.subcategory }}</option>
+    {% endfor %}
+</select>
+<label for="subcategories">SubCategory</label>

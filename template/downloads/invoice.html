@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+
+    <style>
+        .main {
+            background-color: #272E48;
+            color: #BCD0F7;
+            padding: 10px 0 5px 8px;
+        }
+
+        .user {
+            background-color: #272E48;
+            color: #6693B5;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Company Details -->
+
+    <table class="main">
+        <tr>
+            <td>
+                <h1>
+                    Neon Electronics
+                </h1>
+            </td>
+            <td style="padding-left: 85px;">
+                Maxwell admin Inc, 45 NorthWest Street. <br>
+                Sunrise Blvd, San Francisco. <br>
+                00000 00000
+            </td>
+        </tr>
+    </table>
+
+    <!-- Company Details ends -->
+    {% for o in orderobj %}
+    <!-- User details -->
+
+    <table class="user ">
+        <tr style="margin: 40px;">
+            <td width="100%">
+                <h1 style="padding: 15px 0 10px 10px; background-color: #1A233A;">
+                    {{ o.uid.name }} <br> <small>
+                        {{ o.ShippingAddress.addres }} <br>
+                        {{ o.ShippingAddress.pincode }}
+                    </small>
+                </h1>
+            </td>
+            <td width="50%" style="background-color: #1A233A;">
+                Invoice : #{{ o.id }} <br>
+                Date : {{ o.orderedtime|date }} <br>
+                Time : {{ o.orderedtime|time }} <br>
+            </td>
+        </tr>
+    </table>
+
+    <!-- User details ends -->
+
+    <!--Product Details-->
+
+
+    <table>
+        <tr style="margin: 40px;background-color: #2F71C1;padding-top: 6px;padding-bottom: 6px;color: white;">
+            <td width="50%">
+                Item
+            </td>
+            <td>
+                Price
+            </td>
+            <td>
+                Quantity
+            </td>
+            <td>
+                Sub total
+            </td>
+
+        </tr>
+        <!-- Looping Products-->
+
+        <tr style="background-color: #F2F6F8;color: balck; font-size: 12px;padding:15px;">
+            <td>{{ o.pid.name }}</td>
+            <td> Rs. {{ o.pid.price }}</td>
+            <td>{{ o.quantity }}</td>
+            <td> Rs. {{ o.pid.price }}</td>
+        </tr>
+
+
+    </table>
+<br>
+    <table>
+        <tr>
+            <td>
+                Payment Method: {{ o.paymentMethod }} <br>
+                Payment Id: {{ o.paymentId }}
+            </td>
+        </tr>
+    </table>
+
+
+
+    {% endfor %}
+</body>
+
+</html>

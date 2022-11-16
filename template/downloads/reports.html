@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+
+    <style>
+        .main {
+            background-color: #272E48;
+            color: #BCD0F7;
+            padding: 10px 0 5px 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <!-- Company Details -->
+
+    <table class="main">
+        <tr>
+            <td>
+                <h1>
+                    Neon Electronics
+                </h1>
+            </td>
+            <td style="padding-left: 85px;">
+                Maxwell admin Inc, 45 NorthWest Street. <br>
+                Sunrise Blvd, San Francisco. <br>
+                00000 00000
+            </td>
+        </tr>
+    </table>
+
+    <!-- Company Details ends -->
+
+    <!--Product Details-->
+
+
+    <table>
+        <tr style="margin: 40px;background-color: #2F71C1;padding-top: 6px;padding-bottom: 6px;color: white;">
+            <td>
+                Item
+            </td>
+            <td>
+                Price
+            </td>
+            <td>
+                Quantity
+            </td>
+            <td>
+                Sub total
+            </td>
+            <td>
+                Payment Method
+            </td>
+            <td>
+                Payment Id
+            </td>
+
+        </tr>
+        <!-- Looping Products-->
+        {% for o in orderobj %}
+
+        <tr style="background-color: #F2F6F8;color: balck; font-size: 12px;padding:15px;">
+            <td>{{ o.pid.name }}</td>
+            <td> Rs. {{ o.pid.price }}</td>
+            <td width="8%">{{ o.quantity }}</td>
+            <td> Rs. {{ o.pid.price }}</td>
+            <td>
+                {{ o.paymentMethod }}
+            </td>
+            <td width="25%">
+                {{ o.paymentId }}
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,224 @@
+{% extends 'admin/base.html' %}
+
+{% block order %}
+active
+{% endblock %}
+
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+
+
+<div class="container" style="margin:0rem 0rem;">
+
+    <div class="dropdown text-right">
+        <button class="btn bg-white text-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Filter
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/admin/myorders/?filter=Order+Placed">Order Placed</a></li>
+          <li><a class="dropdown-item" href="/admin/myorders/?filter=Pending">Pending</a></li>
+          <li><a class="dropdown-item" href="/admin/myorders/?filter=Our For Delivery">Out For Delivery</a></li>
+          <li><a class="dropdown-item" href="/admin/myorders/?filter=Delivered">Delivered</a></li>
+          <li><a class="dropdown-item" href="/admin/myorders/?filter=Cancelled">Cancelled</a></li>
+          <li><a class="dropdown-item" href="/admin/myorders/?filter=Returned">Returned</a></li>
+        </ul>
+      </div>
+
+    <div class="card">
+        {% for o in order %}
+        <div class="card-body" style="border:1px solid black;">
+            <div class="d-flex">
+                <div class="m-4">
+                    <img src="/media/{{ o.pid.img1 }}" style="height: 8rem;width:5rem;" alt="">
+
+                </div>
+                <div class="p-5">
+                    <div class="d-flex justify-content-end">
+                        <div class="mr-5">
+                            {{ o.pid.name }} <br>
+                            ₹{{ o.pid.price }} <br>
+                            Quantity:&nbsp;{{ o.quantity }} <br>
+
+                        </div>
+                        <div>
+
+                            <strong> Delivery Address: </strong> <br>
+                            {{ o.ShippingAddress.name }} <br>
+                            {{ o.ShippingAddress.city }} <br>
+                            {{ o.ShippingAddress.state }} <br>
+                            {{ o.ShippingAddress.addres }} <br>
+                            Pincode : {{ o.ShippingAddress.pincode }} <br>
+                            Contact Number: {{ o.ShippingAddress.phone }}
+                        </div>
+                        <div class="mx-5 px-5">
+                            <strong>Order Status</strong>
+                            <div style="background-color:{% if o.orderStatus == 'Cancelled'%} red {% else %} green {% endif %};border-radius: 50px;height: 1px;width: 1px;padding: 5%;"
+                                class="mx-auto my-3">
+                            </div>
+                            <select id="orderstatus{{ forloop.counter }}" class="form-control form-control-sm"
+                                style="border: 2px solid rgb(107, 107, 243);"
+                                onchange="orderstatus({{ o.id }},'orderstatus{{ forloop.counter }}')">
+
+                                {% if o.orderStatus == 'Order Placed' %}
+                                <option value="Order Placed" selected>Order Placed</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Our For Delivery">Out For Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+
+                                {% elif o.orderStatus == 'Pending' %}
+                                <option value="Pending" selected>Pending</option>
+                                <option value="Our For Delivery">Out For Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+
+                                {% elif o.orderStatus == 'Our For Delivery' %}
+                                <option value="Our For Delivery" selected>Out For Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+
+                                {% elif o.orderStatus == 'Delivered' %}
+                                <option value="Delivered">Delivered</option>
+
+                                {% elif o.orderStatus == 'Cancelled' %}
+                                <option value="Cancelled">Cancelled</option>
+                                {% elif o.orderStatus == 'Returned' %}
+                                <option value="Returned">Returned</option>
+                                {% endif %}
+                            </select>
+                            <label for="orderstatus{{ o.id }}" style="font-size: 0.8rem;">Change Order Status</label>
+                        </div>
+                        <!-- <div>
+                            <button class="btn btn-danger" id="{{ o.id }}" onclick="confirmation({{ o.id }})" {% if o.orderStatus == 'cancelled' %} hidden {% endif %}>
+                                Cancel Order
+                            </button>
+                        </div> -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <div class="container my-5 d-flex justify-content-center">
+
+        <nav aria-label="...">
+            <ul class="pagination">
+            {% if order.has_previous %}
+            <li class="page-item">
+                <span class="page-link"><a href="/admin/myorders/{% if filter %}?filter={{ filter }}&pgno={{ order.number|add:-1 }}{% else %}?pgno={{ order.number|add:-1 }}{% endif %}">Previous</a></span>
+            </li>
+            {% endif %}
+            {% for lp in lastpage %}
+            <li class="page-item {% if order.number == lp %}active{% endif %}"><a class="page-link" href="/admin/myorders/{% if filter %}?filter={{ filter }}&pgno={{ lp }}{% else %}?pgno={{ lp }}{% endif %}">{{ lp }}</a></li>
+            {% endfor %}
+            {% if order.has_next %}
+            <li class="page-item">
+                <li class="page-item">
+                    <span class="page-link"><a href="/admin/myorders/{% if filter %}?filter={{ filter }}&pgno={{ order.number|add:1 }}{% else %}?pgno={{ order.number|add:1 }}{% endif %}">Next</a></span>
+                </li>
+            </li>
+            {% endif %}
+            </ul>
+        </nav>
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+
+
+    function orderstatus(oid, ostatus) {
+        console.log(oid)
+        console.log(ostatus)
+        $.ajax({
+            url:'/admin/changeorderstatus/',
+            type:'post',
+            data:{
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+                'ostatus' : $('#'+ostatus).val(),
+                'oid':oid,
+            },
+            success:function(response){
+                location.reload()
+            },
+            error:function(){
+                swal('Not Updated')
+            }
+
+        })
+
+    }
+
+    // console.log(oid)
+    // console.log(status)
+
+    // $('#'+status).change(function() {
+    //     console.log(oid)
+    //     console.log(status)
+    //     $('#'+status).val()
+    //     // console.log($(this).val())
+    //     console.log(status)
+
+    // })
+
+    // function confirmation(oid) {
+    //     swal({
+    //         title: "Are you sure?",
+    //         text: "Are you sure to cancel Your Order?",
+    //         icon: "warning",
+    //         buttons: true,
+    //         dangerMode: true,
+    //     })
+    //         .then((willDelete) => {
+    //             if (willDelete) {
+    //                 $.ajax({
+    //                     url: "/user/cancelorder/",
+    //                     type: 'POST',
+    //                     data: {
+    //                         'oid': oid,
+    //                         csrfmiddlewaretoken: "{{ csrf_token }}"
+    //                     },
+    //                     success: function (response) {
+    //                         // $('#'+colr).css('background-color','red')
+    //                         swal({
+    //                             icon: 'success',
+    //                             title: 'Order Cancelled Successfully'
+    //                         })
+    //                             .then((v) => {
+    //                                 window.location.reload()
+    //                             })
+    //                     },
+    //                     error: function (response) {
+    //                         swal("Some Error Occured")
+    //                     }
+
+    //                 })
+    //             }
+    //         });
+    // }
+
+</script>
+
+
+{% endblock %}

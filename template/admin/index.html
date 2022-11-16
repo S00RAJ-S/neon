@@ -1,0 +1,298 @@
+{% extends 'admin/base.html' %}
+
+{% block dashboard %}
+active
+{% endblock %}
+
+{% block content %}
+
+<!-- Sale & Revenue Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4 d-flex justify-content-center">
+        <!-- <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Today Sale</p>
+                    <h6 class="mb-0">$1234</h6>
+                </div>
+            </div>
+        </div> -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Total Sale</p>
+                    <h6 class="mb-0">{{ totalsale }}</h6>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-area fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Today Revenue</p>
+                    <h6 class="mb-0">$1234</h6>
+                </div>
+            </div>
+        </div> -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Total Revenue</p>
+                    <h6 class="mb-0">₹{{ totalrevenue }}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sale & Revenue End -->
+
+<hr>
+
+<!-- Sales Chart Start -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div style="height: 28rem;width:40rem;">
+  <h4>Sales Chart</h4>
+  <canvas id="saleschart"></canvas>
+</div>
+
+<div style="height: 30rem;width:40rem;">
+  <h4>Revenue Chart</h4>
+  <canvas id="revenuechart"></canvas>
+</div>
+
+<div style="height: 23rem;width:23rem;">
+  <h4>Category wise sales</h4>
+  <canvas id="categorysales"></canvas>
+</div>
+
+<div style="height: 23rem;width:23rem;">
+  <h4>Category wise Revenue</h4>
+  <canvas id="categoryrevenue"></canvas>
+</div>
+
+<div>
+  {% for o in revenue %}
+  {{ o.amt }},
+  {% endfor %}
+</div>
+
+
+
+<script>
+  const labels = [
+  {% for o in orders reversed %}
+  '{{ o.orderedtime__date }}',
+  {% endfor %}
+];
+
+// console.log(labels)
+
+// datasets: [
+//       {
+//       label: 'Sales of Last 30 Days',
+//       backgroundColor: 'rgb(255, 99, 132)',
+//       borderColor: 'rgb(255, 99, 132)',
+//       data: [
+//         {% for o in orders %}
+//         {{ o.sales }},
+//         {% endfor %}
+//       ],
+//     },
+//     {
+//       label: 'Revenue of Last 30 Days',
+//       backgroundColor: 'rgb(255, 99, 132)',
+//       borderColor: 'rgb(255, 99, 132)',
+//       data: [
+//         {% for r in revenue %}
+//         {{ o.amt }},
+//         {% endfor %}
+//       ],
+//     },
+
+//   ]
+
+
+  const data = {
+    labels: labels,
+    datasets: [
+      //Total Orders
+      {
+    label: 'Total Orders',
+    data: [
+    {% for o in orders reversed %}
+        {{ o.sales }},
+        {% endfor %}
+    ],
+    fill: false,
+    borderColor: 'rgb(34, 168, 240)',
+    tension: 0
+  },
+
+  //cancelled orders
+
+  {
+    label: 'Cancelled Orders',
+    data: [
+    {% for co in corders reversed %}
+    {{ co.status }},
+    {% endfor %}   
+    ],
+    fill: false,
+    borderColor: 'rgb(240, 10, 17)',
+    tension: 0
+  },
+
+  //Delivered Orders
+
+  {
+    label: 'Delivered Orders',
+    data: [
+    {% for co in dorders reversed %}
+    {{ co.status }},
+    {% endfor %}   
+    ],
+    fill: false,
+    borderColor: 'rgb(11, 189, 17)',
+    tension: 0
+  },
+]
+  };
+
+  const config = {
+    type: 'line',
+    data: data,
+    options: {}
+  };
+</script>
+
+<script>
+  const myChart = new Chart(
+    document.getElementById('saleschart'),
+    config
+  );
+</script>
+
+
+
+
+
+<!-- Sales Chart End -->
+
+
+<!--Revenue Chart-->
+
+<script>
+ 
+  
+  const Revenuedata = {
+    labels: labels,
+  datasets: [{
+    label: 'Revenue',
+    data: [
+      {% for r in dailyrevenue %}
+      {{ r.amount }},
+      {% endfor %}
+    ],
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0
+  }]
+};
+
+const Revenueconfig = {
+  type: 'line',
+  data: Revenuedata,
+};
+
+const RevenueChart = new Chart(
+    document.getElementById('revenuechart'),
+    Revenueconfig
+  );
+
+
+
+
+//Category wise sales
+
+
+const categorysalesdata = {
+  labels: [
+    {% for c in categories %}
+    '{{ c.category }}',
+    {% endfor %}
+  ],
+  datasets: [{
+    label: 'My First Dataset',
+    data: [
+      {% for s in categorysales %}
+      {{ s }},
+      {% endfor %}
+    ],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)'
+    ],
+    hoverOffset: 4
+  }]
+};
+
+  const categorysalesconfig = {
+    type: 'doughnut',
+    data: categorysalesdata,
+  };
+const categorysalesChart = new Chart(
+    document.getElementById('categorysales'),
+    categorysalesconfig
+  );
+
+
+
+//Category wise revenue
+
+
+const categoryrevenuedata = {
+  labels: [
+    {% for c in categories %}
+    '{{ c.category }}',
+    {% endfor %}
+  ],
+  datasets: [{
+    label: 'My First Dataset',
+    data: [
+      {% for r in catrevenue %}
+      {{ r }},
+      {% endfor %}
+    ],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)'
+    ],
+    hoverOffset: 4
+  }]
+};
+
+  const categoryrevenueconfig = {
+    type: 'doughnut',
+    data: categoryrevenuedata,
+  };
+const categoryrevenueChart = new Chart(
+    document.getElementById('categoryrevenue'),
+    categoryrevenueconfig
+  );
+</script>
+
+
+
+
+
+
+<!--Revenue Chart-->
+
+{% endblock %}
