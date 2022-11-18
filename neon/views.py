@@ -8,6 +8,9 @@ from neon.decorators import *
 from neonadmin.models import products,categories,banner
 
 
+def error_404_view(request, exception):
+    return render(request, '404.html')
+
 def landingpage(request):
     if validationadmin(request):
         return redirect('/admin/')

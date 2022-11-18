@@ -23,9 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&0(8aw3%7xegnmk-u7(2qcd*z4w_ja0v)mr&99)vj$v62obk%!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["www.neon-e-store.tk","neon-e-store.tk","localhost"] 
+# ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -90,6 +91,12 @@ DATABASES = {
         'USER':'sooraj',
         'PASSWORD':'daP5My3cPy8Bpkj',
         'PORT':''
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME':'neon',
+        # 'HOST':'localhost',
+        # 'USER':'postgres',
+        # 'PASSWORD':'sooraj',
+        # 'PORT':'5432'
     }
 }
 

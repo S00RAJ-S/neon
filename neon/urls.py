@@ -35,3 +35,5 @@ urlpatterns = [
     path('razorpay/',include(R)),
     path('validatetotp/',views.validatetotp),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = 'neon.views.error_404_view'
