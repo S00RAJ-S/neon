@@ -95,7 +95,7 @@ https://templatemo.com/tm-571-hexashop
                             <li class="scroll-to-section d-none d-xl-block">
                                 <form class="form-inline" id="searchform" method="get" action="/user/query/">
                                     <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search"
-                                        aria-label="Search" id="searchinput">
+                                        aria-label="Search" id="searchinput" value="{{ request.GET.query }}">
                                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                                 </form>
                             </li>

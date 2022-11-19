@@ -594,28 +594,66 @@ def search(request):
         cartcount = False
         user = False
     q = request.GET.get('query')
+    cc = categories.objects.filter(Q(category__icontains = q))
+    lis = [x for x in cc]
     # print(q)
-    searchresult = products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q))
-    c = categories.objects.filter(category__icontains = q)
-    for cat in c:
-        searchincategory = products.objects.filter(category_id = cat)
-
-    # print(pgno)
+    #searching quries
     try:
-        finaldata = searchresult.union(searchincategory)
-        r1 = Paginator(finaldata,4)
-        r = r1.get_page(pgno)
-        count = []
-        for i in range(1,(r1.num_pages+1)):
-            count.append(i)
-        return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q})
+        sort = request.GET.get('sort')
+        if sort == 'htl':
+            s = '-price'
+        elif sort == 'lth':
+            s = 'price'
+        else:
+            raise Exception('')
+
+        searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis)).order_by(s)]
+        # c = categories.objects.filter(category__icontains = q)
+        # searchincategory = []
+        # for cat in c:
+        #     p = products.objects.filter(category_id = cat).order_by(s)
+        #     for x in p:
+        #         searchincategory.append(x)
+        # finaldata = []
+        # finaldata.extend(searchresult)
+        # for fd in finaldata:
+        #     for d in searchincategory:
+        #         if fd == d :
+        #             searchincategory.remove(d)
+        # # finaldata.append(searchincategory)
+        # for dis in finaldata:
+        #     print(dis.price)
     except:
-        r1 = Paginator(searchresult,4)
-        r = r1.get_page(pgno)
-        count = []
-        for i in range(1,(r1.num_pages+1)):
-            count.append(i)
-        return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q})
+        searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis))]
+
+        #----- Method First Tried ------#
+        # searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q))]
+        # c = categories.objects.filter(category__icontains = q)
+        # searchincategory = []
+        # for cat in c:
+        #     p = products.objects.filter(category_id = cat)
+        #     for x in p:
+        #         searchincategory.append(x)
+        # finaldata = []
+        # finaldata = list(set(searchincategory + searchresult))
+    #searching quries ends
+
+    # for x in finaldata:
+    #     print(x.price)
+    r1 = Paginator(searchresult,4)
+    r = r1.get_page(pgno)
+    count = []
+    for i in range(1,(r1.num_pages+1)):
+        count.append(i)
+    return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q})
+    # except:
+    #     r1 = Paginator(searchresult,4)
+    #     r = r1.get_page(pgno)
+    #     count = []
+    #     for i in range(1,(r1.num_pages+1)):
+    #         count.append(i)
+    #     print("inside except")
+    #     return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q})
 
     
 #2FA
