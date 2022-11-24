@@ -600,6 +600,8 @@ def search(request):
     #searching quries
     try:
         sort = request.GET.get('sort')
+        min = request.GET.get('min')
+        max = request.GET.get('max')
         if sort == 'htl':
             s = '-price'
         elif sort == 'lth':
@@ -608,6 +610,33 @@ def search(request):
             raise Exception('')
 
         searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis)).order_by(s)]
+        torem =[]
+        # print(max,min)
+        try:
+            # print('MIN')
+            if min is not None:
+                for s in searchresult:
+                    if s.price < int(min):
+                        torem.append(s)
+        except:
+            pass
+
+        try:
+            # print('MAX')
+            if max is not None:
+                for s in searchresult:
+                    if s.price > int(max):
+                        torem.append(s)
+        except:
+            pass
+
+
+        for item in torem:
+            for se in searchresult:
+                if item == se:
+                    searchresult.remove(se)
+
+                    
         # c = categories.objects.filter(category__icontains = q)
         # searchincategory = []
         # for cat in c:
@@ -625,6 +654,7 @@ def search(request):
         #     print(dis.price)
     except:
         searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis))]
+        
 
         #----- Method First Tried ------#
         # searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q))]
@@ -637,7 +667,10 @@ def search(request):
         # finaldata = []
         # finaldata = list(set(searchincategory + searchresult))
     #searching quries ends
-
+    maxprice = 0
+    for m in products.objects.all():
+        if m.price > maxprice:
+            maxprice = m.price
     # for x in finaldata:
     #     print(x.price)
     r1 = Paginator(searchresult,4)
@@ -645,7 +678,7 @@ def search(request):
     count = []
     for i in range(1,(r1.num_pages+1)):
         count.append(i)
-    return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q})
+    return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q,'maxprice':maxprice})
     # except:
     #     r1 = Paginator(searchresult,4)
     #     r = r1.get_page(pgno)

@@ -26,7 +26,7 @@ active
         </div>
         <div>
             <label for="to">To:</label>
-            <input type="date" id="to">
+            <input type="date" max="{% now 'Y' %}-{% now 'm' %}-{% now 'd' %}" id="to">
         </div>
     </div>
     <div class="d-flex">

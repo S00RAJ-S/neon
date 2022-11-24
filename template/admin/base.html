@@ -285,6 +285,9 @@
                 </div>
                 {% endif %}
                 <div class="row vh-120 bg-light rounded align-items-center justify-content-center mx-0">
+                    <div class="d-flex justify-content-end">
+                        <p id="currentTime" class="pt-4"></p>
+                    </div>
 
                     {% block content %}
 
@@ -326,6 +329,13 @@
     </div>
 
     <!-- JavaScript Libraries -->
+    <script>
+        setInterval(function() {
+    const currentTime = new Date();
+    var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'IST', };
+  document.getElementById('currentTime').innerHTML = new Intl.DateTimeFormat('en-IN', options).format(currentTime);
+}, 1000);
+    </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'admin/lib/chart/chart.min.js' %}"></script>

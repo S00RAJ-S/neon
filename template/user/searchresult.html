@@ -1,5 +1,6 @@
 {% extends 'user/base.html' %}
 {% load static %}
+{% load url_param_change %}
 
 {% block title %}
 Neon | Cart
@@ -37,14 +38,94 @@ Neon | Cart
         text-decoration: underline !important;
         cursor: pointer;
     }
+.range_container {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: 15% auto;
+}
+
+.sliders_control {
+  position: relative;
+  min-height: 20px;
+}
+
+.form_control {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  color: #635a5a;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: all;
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  border:1px solid black;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #C6C6C6;
+  cursor: pointer;
+}
+
+input[type=range]::-moz-range-thumb {
+  -webkit-appearance: none;
+  pointer-events: all;
+  width: 18px;
+  height: 18px;
+  background-color: #fff;
+  border:1px solid black;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #C6C6C6;
+  cursor: pointer;  
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  background: #f7f7f7;
+}
+
+input[type=range]::-webkit-slider-thumb:active {
+  box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+  -webkit-box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+}
+
+input[type="number"] {
+  color: #8a8383;
+  width: 50px;
+  height: 18px;
+  font-size: 16px;
+  border: none;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {  
+   opacity: 1;
+}
+
+input[type="range"] {
+  -webkit-appearance: none; 
+  appearance: none;
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  background-color: #C6C6C6;
+  pointer-events: none;
+}
+
+#fromSlider {
+  height: 0;
+  z-index: 1;
+}
 </style>
 
 <div class="container d-flex" style="margin-top:7rem">
 
     <h6>Sort By - </h6>
     <ul class="d-flex mx-5">
-        <li class="mx-5"><a {% if request.GET.sort != "htl" %} href="{{ request.path }}?query={{ request.GET.query }}&sort=htl" {% else %} href="{{ request.get_full_path }}" {% endif %}> Price : High to Low </a></li>
-        <li class="mx-5"><a {% if request.GET.sort != "lth" %} href="{{ request.path }}?query={{ request.GET.query }}&sort=lth" {% else %} href="{{ request.get_full_path }}" {% endif %}> Price : Low to High </a></li>
+        <li class="mx-5"><a href="{% urlparam request 'sort' 'htl' %}">Price : High to Low </a></li>
+        <li class="mx-5"><a href="{% urlparam request 'sort' 'lth' %}">Price : Low to High </a></li>
     </ul>
 </div>
 
@@ -53,6 +134,25 @@ Neon | Cart
     <div class="col-lg-3">
         <ol>
             <li>
+                Price Range:
+                <div class="range_container">
+                    <div class="sliders_control">
+                        <input id="fromSlider" type="range" {% if request.GET.min %} value="{{ request.GET.min }}" {% else %} value="0" {% endif %} min="0" max="{{ maxprice }}" onmouseup="getminval()">
+                        <input id="toSlider" type="range" {% if request.GET.max %} value="{{ request.GET.max }}" {% else %} value="{{ maxprice }}" {% endif %} min="0" max="{{ maxprice }}" onmouseup="getmaxval()">
+                    </div>
+                    <div class="form_control">
+                        <div class="form_control_container">
+                            <div class="form_control_container__time">Min</div>
+                            <input class="form_control_container__time__input" type="number" id="fromInput" {% if request.GET.min %} value="{{ request.GET.min }}" {% else %} value="0" {% endif %} min="0" max="{{ maxprice }}" onchange="getminval()">
+                        </div>
+                        <div class="form_control_container">
+                            <div class="form_control_container__time">Max</div>
+                            <input class="form_control_container__time__input" type="number" id="toInput" {% if request.GET.max %} value="{{ request.GET.max }}" {% else %} value="{{ maxprice }}" {% endif %} min="0" max="{{ maxprice }}" onchange="getmaxval()">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <!-- <li>
 
                 Brand
                 <form class="form-inline">
@@ -65,7 +165,7 @@ Neon | Cart
             </li>
             <li>
                 Internal Storage
-            </li>
+            </li> -->
         </ol>
     </div>
     
@@ -109,16 +209,16 @@ Neon | Cart
                 <ul class="pagination">
                 {% if result.has_previous %}
                 <li class="page-item">
-                    <span class="page-link"><a href="/user/query/?query={{ query }}&sort={{ request.GET.sort }}&pgno={{ result.number|add:-1 }}">Previous</a></span>
+                    <span class="page-link"><a href="{% urlparam request 'pgno' result.number|add:-1 %}">Previous</a></span>
                 </li>
                 {% endif %}
                 {% for lp in lastpage %}
-                <li class="page-item {% if result.number == lp %}active{% endif %}"><a class="page-link" href="/user/query/?query={{ query }}&sort={{ request.GET.sort }}&pgno={{ lp }}">{{ lp }}</a></li>
+                <li class="page-item {% if result.number == lp %}active{% endif %}"><a class="page-link" href="{% urlparam request 'pgno' lp %}">{{ lp }}</a></li>
                 {% endfor %}
                 {% if result.has_next %}
                 <li class="page-item">
                     <li class="page-item">
-                        <span class="page-link"><a href="/user/query/?query={{ query }}&sort={{ request.GET.sort }}&pgno={{ result.number|add:1 }}">Next</a></span>
+                        <span class="page-link"><a href="{% urlparam request 'pgno' result.number|add:1 %}">Next</a></span>
                     </li>
                 </li>
                 {% endif %}
@@ -148,6 +248,117 @@ Neon | Cart
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script>
 
+function controlFromInput(fromSlider, fromInput, toInput, controlSlider) {
+    const [from, to] = getParsed(fromInput, toInput);
+    fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', controlSlider);
+    if (from > to) {
+        fromSlider.value = to;
+        fromInput.value = to;
+    } else {
+        fromSlider.value = from;
+    }
+}
+    
+function controlToInput(toSlider, fromInput, toInput, controlSlider) {
+    const [from, to] = getParsed(fromInput, toInput);
+    fillSlider(fromInput, toInput, '#C6C6C6', '#25daa5', controlSlider);
+    setToggleAccessible(toInput);
+    if (from <= to) {
+        toSlider.value = to;
+        toInput.value = to;
+    } else {
+        toInput.value = from;
+    }
+}
+
+function controlFromSlider(fromSlider, toSlider, fromInput) {
+  const [from, to] = getParsed(fromSlider, toSlider);
+  fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+  if (from > to) {
+    fromSlider.value = to;
+    fromInput.value = to;
+  } else {
+    fromInput.value = from;
+  }
+}
+
+function controlToSlider(fromSlider, toSlider, toInput) {
+  const [from, to] = getParsed(fromSlider, toSlider);
+  fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+  setToggleAccessible(toSlider);
+  if (from <= to) {
+    toSlider.value = to;
+    toInput.value = to;
+  } else {
+    toInput.value = from;
+    toSlider.value = from;
+  }
+}
+
+function getParsed(currentFrom, currentTo) {
+  const from = parseInt(currentFrom.value, 10);
+  const to = parseInt(currentTo.value, 10);
+  return [from, to];
+}
+
+function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
+    const rangeDistance = to.max-to.min;
+    const fromPosition = from.value - to.min;
+    const toPosition = to.value - to.min;
+    controlSlider.style.background = `linear-gradient(
+      to right,
+      ${sliderColor} 0%,
+      ${sliderColor} ${(fromPosition)/(rangeDistance)*100}%,
+      ${rangeColor} ${((fromPosition)/(rangeDistance))*100}%,
+      ${rangeColor} ${(toPosition)/(rangeDistance)*100}%, 
+      ${sliderColor} ${(toPosition)/(rangeDistance)*100}%, 
+      ${sliderColor} 100%)`;
+}
+
+function setToggleAccessible(currentTarget) {
+  const toSlider = document.querySelector('#toSlider');
+  if (Number(currentTarget.value) <= 0 ) {
+    toSlider.style.zIndex = 2;
+  } else {
+    toSlider.style.zIndex = 0;
+  }
+}
+
+const fromSlider = document.querySelector('#fromSlider');
+const toSlider = document.querySelector('#toSlider');
+const fromInput = document.querySelector('#fromInput');
+const toInput = document.querySelector('#toInput');
+fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+setToggleAccessible(toSlider);
+
+fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
+toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
+fromInput.oninput = () => controlFromInput(fromSlider, fromInput, toInput, toSlider);
+toInput.oninput = () => controlToInput(toSlider, fromInput, toInput, toSlider);
+
+
+function getminval(){
+    {% if request.GET.min is none %}
+    window.location.href = "?query={{ request.GET.query }}&sort={{ request.GET.sort }}&max={{ request.GET.max }}&min="+$('#fromInput').val()
+    {% elif request.GET.min == '' %}
+    window.location.href = "?query={{ request.GET.query }}&sort={{ request.GET.sort }}&max={{ request.GET.max }}&min="+$('#fromInput').val()
+    {% elif request.GET.min %}
+    window.location.href = "?query={{ request.GET.query }}&sort={{ request.GET.sort }}&max={{ request.GET.max }}&min="+$('#fromInput').val()
+    {% else %}
+    window.location.href = "/"
+    {% endif %}    
+}
+function getmaxval(){
+    {% if request.GET.min is none %}
+    window.location.href = "?query={{ request.GET.query }}&sort={{ request.GET.sort }}&min={{ request.GET.min }}&max="+$('#toInput').val()
+    {% elif request.GET.min == '' %}
+    window.location.href = "?query={{ request.GET.query }}&sort={{ request.GET.sort }}&min={{ request.GET.min }}&max="+$('#toInput').val()
+    {% elif request.GET.min %}
+    window.location.href = "?query={{ request.GET.query }}&sort={{ request.GET.sort }}&min={{ request.GET.min }}&max="+$('#toInput').val()
+    {% else %}
+    window.location.href = "/"
+    {% endif %}   
+}
     function reduce(qty, cartid) {
         $.ajax({
             url: '/user/updateqty/',
