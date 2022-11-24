@@ -98,7 +98,12 @@
                                     </ol>
                                 </nav>
                                 <h4>{{ p.name }}</h4>
+                                {% if p.calcofferprice %}
+                                <del><span style="color: red;">₹{{ p.price }}</span></del>
+                                <span style="color: green;">₹{{ p.calcofferprice }}</span>
+                                {% else %}
                                 <span>₹{{ p.price }}</span>
+                                {% endif %}
                             </div>
                         </div>
                         {% endif %}
