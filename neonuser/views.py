@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import *
 from django.views.decorators.cache import never_cache
 from neonuser.models import *
-from neonadmin.models import categories, products, banner, coupens
+from neonadmin.models import categories,subcategories, products, banner, coupens
 from django.contrib import messages
 from neon.encryption import encrypt,decrypt
 from neon.decorators import *
@@ -596,6 +596,8 @@ def search(request):
     q = request.GET.get('query')
     cc = categories.objects.filter(Q(category__icontains = q))
     lis = [x for x in cc]
+    ss = subcategories.objects.filter(Q(subcategory__icontains = q))
+    sublis = [x for x in ss]
     # print(q)
     #searching quries
     try:
@@ -609,7 +611,7 @@ def search(request):
         else:
             raise Exception('')
 
-        searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis)).order_by(s)]
+        searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis) | Q(subcategory_id__in = sublis)).order_by(s)]
         torem =[]
         # print(max,min)
         try:
@@ -653,7 +655,7 @@ def search(request):
         # for dis in finaldata:
         #     print(dis.price)
     except:
-        searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis))]
+        searchresult =[i for i in products.objects.filter(Q(name__icontains = q) | Q(brand__icontains = q) | Q(description__icontains = q) | Q(category_id__in = lis) | Q(subcategory_id__in = sublis))]
         
 
         #----- Method First Tried ------#
@@ -678,7 +680,13 @@ def search(request):
     count = []
     for i in range(1,(r1.num_pages+1)):
         count.append(i)
-    return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q,'maxprice':maxprice})
+    try:
+        cat = categories.objects.filter(Q(category = q))
+        sub = [x for x in cat]
+        subcat = subcategories.objects.filter(Q(category_id__in = sub))
+    except:
+        subcat = None
+    return render(request,'user/searchresult.html',{"cartcount":cartcount,"name":user,'result':r,'lastpage':count,'query':q,'maxprice':maxprice,'subcat':subcat})
     # except:
     #     r1 = Paginator(searchresult,4)
     #     r = r1.get_page(pgno)

@@ -16,6 +16,15 @@
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
 </li>
+<li class="submenu">
+    <a href="javascript:;">Categories</a>
+    <ul>
+        {% for i in categories %}
+        <li><a href="/user/query/?query={{ i.category }}">{{ i.category }}</a></li>
+        {% endfor %}
+    </ul>
+</li>
+
 <li class="scroll-to-section"><a href="/login/" class="active">Login</a></li>
 <li class="scroll-to-section"><a href="/user/signup/" class="active">Signup</a></li>
 {% endblock %}
@@ -24,6 +33,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
     integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 <!-- ***** Main Banner Area Start ***** -->
+{% if banner %}
 <div class="main-banner" id="top">
     <div class="container-fluid">
         <div class="row">
@@ -40,6 +50,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 <!-- ***** Main Banner Area End ***** -->
 
 <!-- ***** Category wise product list Starts ***** -->

@@ -43,8 +43,15 @@
                         class="mx-3 text-center"><br>
                     <button type="submit" class="btn btn-primary my-5">Login</button>
                 </form>
-                <a id="otptimer"> Resend OTP in <span id="countdowntimer">5 </span> Minutes</a>
+                <button style="border: none;" id="otptimer"> Resend OTP in <span id="countdowntimer">5 </span> Minutes</button>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
                 <script>
+                    function gotonext(gotoid) {
+            document.getElementById(gotoid).focus()
+        }
+
                     //Resend OTP function
                     var timeleft = 5;
                     var downloadTimer = setInterval(function () {
@@ -53,22 +60,33 @@
                         if (timeleft <= 0){
                             clearInterval(downloadTimer);
                             $('#otptimer').text('Resend OTP')
-                            $('#otptimer').attr('href','/lotp/')
+                            $('#otptimer').click(function (){
+                                $.ajax({
+                                    url:'/sendotp/',
+                                    type:'POST',
+                                    data:{
+                                        csrfmiddlewaretoken:"{{ csrf_token }}",
+                                        'phone': '{{ phno }}'
+                                    },
+                                    success:function(r){
+                                        swal("OTP sent Successfully")
+                                    }
+                                })
+
+                            })
                         }
                     }, 1000);
                 </script>
             </div>
         </center>
     </div>
-    <script>
-        function gotonext(gotoid) {
-            document.getElementById(gotoid).focus()
-        }
-    </script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+              </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>

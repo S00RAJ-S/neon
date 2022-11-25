@@ -19,7 +19,7 @@ from django.contrib import messages
 def sendotp(request):
     if request.method == "POST":
         try:
-            ph = request.POST.get('phone')
+            ph = int(request.POST.get('phone'))
             neonlogin.objects.get(phone = ph)
             account_sid = 'AC3fbf6eb6e3e9f5ccacfc98f8bab1c5ce'
             auth_token = '97b33b574d5c95b22b5bac3bb1971c05'
@@ -29,7 +29,7 @@ def sendotp(request):
             request.session['ph'] = ph
             request.session.set_expiry(300)
             client.messages.create(body="Your OTP to Login to Your Account is {0}. The OTP is valid only for 5mins ".format(otp),from_='+19705008034',to='+918590203684')
-            return render(request,"enterotp.html")
+            return render(request,"enterotp.html",{'phno':ph})
         except:
             messages.warning(request,"User does not exist with the Phone Number")
             return redirect('/lotp/')
@@ -39,11 +39,15 @@ def sendotp(request):
 
 def valadatingotp(request):
     if request.method == "POST":
-        otp1 = request.POST.get('otp1')        
-        otp2 = request.POST.get('otp2')
-        otp3 = request.POST.get('otp3')
-        otp4 = request.POST.get('otp4')       
-        otp = int(otp1+otp2+otp3+otp4) 
+        try:
+            otp1 = request.POST.get('otp1')        
+            otp2 = request.POST.get('otp2')
+            otp3 = request.POST.get('otp3')
+            otp4 = request.POST.get('otp4')       
+            otp = int(otp1+otp2+otp3+otp4) 
+        except:
+            messages.warning(request,"Enter valid OTP")
+            return redirect('/')
         try:
             if otp == request.session['otp']:
                 phone = request.session['ph']

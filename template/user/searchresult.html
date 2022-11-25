@@ -19,10 +19,23 @@ Neon | Cart
     </ul>
 </li>
 
+{% else %}
+<li class="scroll-to-section"><a href="/login/" class="active">Login</a></li>
+<li class="scroll-to-section"><a href="/user/signup/" class="active">Signup</a></li>
 {% endif %}
 {% endblock %}
 
 {% block categoriesdisplay %}
+{% if subcat %}
+<li class="submenu">
+    <a href="javascript:;">Sub Categories</a>
+    <ul>
+        {% for i in subcat %}
+        <li><a href="/user/query/?query={{ i.subcategory}}">{{ i.subcategory }}</a></li>
+        {% endfor %}
+    </ul>
+</li>
+{% endif %}
 {% endblock %}
 
 {% block content %}
