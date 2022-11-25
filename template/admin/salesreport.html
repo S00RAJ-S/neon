@@ -30,14 +30,76 @@ active
         </div>
     </div>
     <div class="d-flex">
-        <button class="btn btn-primary mx-auto w-50" id="fetchbtn">Fetch</button>
+        <button class="btn btn-primary ml-auto mr-2 w-25" id="fetchbtn">Fetch</button>
+        <button class="btn btn-primary mr-auto ml-2 w-25" id="downloadbtn">Download</button>
+    </div>
+    Generate Report by: <br>
+    <div class="d-flex">
+        <div><button class="btn bg-info m-3 text-white" id="monthly">Monthly</button></div>
+        <div><button class="btn bg-info m-3 text-white" id="yearly">Yearly</button></div>
     </div>
     <div id="salesreport">
         <!-- To Display sales Report-->
+        {% if orders %}
+<table class="mx-auto my-5">
+    <tr style="background-color: #2F71C1;color: white;">
+        <td>
+            Item
+        </td>
+        <td>
+            Price
+        </td>
+        <td>
+            Quantity
+        </td>
+        <td>
+            Sub total
+        </td>
+        <td>
+            Payment Method
+        </td>
+        <td>
+            Payment Id
+        </td>
+
+    </tr>
+    <!-- Looping Products-->
+    {% for o in orders %}
+
+    <tr style="background-color: #F2F6F8;color: balck;">
+        <td>{{ o.pid.name }}</td>
+        <td> Rs. {{ o.pid.price }}</td>
+        <td width="8%">{{ o.quantity }}</td>
+        <td> Rs. {{ o.pid.price }}</td>
+        <td>
+            {{ o.paymentMethod }}
+        </td>
+        <td width="25%">
+            {{ o.paymentId }}
+        </td>
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+{% else %}
+<h5 class="text-danger m-3">
+    No Records Found
+</h5>
+{% endif %}
     </div>
 </div>
 
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    $("#monthly").click(function(){
+        $("#salesreport").load('/admin/genreport/?val=monthly')
+    })
+
+    $("#yearly").click(function(){
+        $("#salesreport").load('/admin/genreport/?val=yearly')
+    })
 
     $("#fetchbtn").click(function(){
         var fromdate = $("#from").val()
@@ -56,6 +118,50 @@ active
         }
         else if(fromdate && todate){
             $("#salesreport").load('/admin/genreport/?from='+fromdate+'&to='+todate)
+        }
+    })
+
+    $("#downloadbtn").click(async function(){
+        var fromdate = $("#from").val()
+        var todate = $("#to").val()
+        if(fromdate.length == 0){
+            swal({
+                icon:'warning',
+                title:"Select From Date"
+            })
+        }
+        else if(todate.length == 0){
+            swal({
+                icon:'warning',
+                title:"Select To Date"
+            })
+        }
+        else if(fromdate && todate){
+            const inputOptions = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                'pdf': 'PDF',
+                'excel': 'EXCEL',
+                'doc': 'DOC'
+                })
+            }, 10)
+            })
+
+            const { value: doctype } = await Swal.fire({
+            title: 'Select A formate to Download',
+            input: 'radio',
+            showCancelButton: 'true',
+            inputOptions: inputOptions,
+            inputValidator: (value) => {
+                if (!value) {
+                return 'You need to choose something!'
+                }
+            }
+            })
+
+            if (doctype) {
+                window.location.href = '/admin/genreport/?from='+fromdate+'&to='+todate+'&doctype='+doctype
+            }
         }
     })
 

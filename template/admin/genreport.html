@@ -28,7 +28,7 @@
         <td>{{ o.pid.name }}</td>
         <td> Rs. {{ o.pid.price }}</td>
         <td width="8%">{{ o.quantity }}</td>
-        <td> Rs. {{ o.pid.price }}</td>
+        <td> Rs. {{ o.calcfinalamt }}</td>
         <td>
             {{ o.paymentMethod }}
         </td>
@@ -40,7 +40,62 @@
     {% endfor %}
 
 </table>
+{% elif val == 'monthly' %}
+<table class="mx-auto my-5">
+    <tr style="background-color: #2F71C1;color: white;" class="text-center">
+        <td>
+            Month
+        </td>
+        <td>
+            Value of Delivered Orders
+        </td>
+        <td>
+            Values of Cancelled orders
+        </td>
+    </tr>
+    <!-- Looping Products-->
+    {% for do in dorders %}
+    {% for co in corders %}
+    {% if do.orderedtime__month == co.orderedtime__month %}
 
+    <tr style="background-color: #F2F6F8;color: balck;" class="text-center">
+        <td width="30%">{{ do.orderedtime__month }}</td>
+        <td width="30%"> Rs. {{ do.amount }}</td>
+        <td width="38%">{{ co.amount }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+
+</table>
+{% elif val == 'yearly' %}
+<table class="mx-auto my-5">
+    <tr style="background-color: #2F71C1;color: white;" class="text-center">
+        <td>
+            Year
+        </td>
+        <td>
+            Value of Delivered Orders
+        </td>
+        <td>
+            Values of Cancelled orders
+        </td>
+    </tr>
+    <!-- Looping Products-->
+    {% for do in dorders %}
+    {% for co in corders %}
+    {% if do.orderedtime__year == co.orderedtime__year %}
+
+    <tr style="background-color: #F2F6F8;color: balck;" class="text-center">
+        <td width="30%">{{ do.orderedtime__year }}</td>
+        <td width="30%"> Rs. {{ do.amount }}</td>
+        <td width="38%">{{ co.amount }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+
+</table>
 {% else %}
 <h5 class="text-danger m-3">
     No Records Found

@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse,StreamingHttpResponse
 from django.shortcuts import *
 from neon.decorators import *
 from neon.pdfgenerator import render_to_pdf
@@ -21,7 +21,7 @@ def adminhome(request):
         dailyrevenue = orders.objects.values('orderedtime__date').annotate(amount = Sum('amount'))
         totalrevenue = 0
         for o in order:
-            totalrevenue += (o.amount - o.less)
+            totalrevenue += o.calcfinalamt()
         datewiseorders = orders.objects.values('orderedtime__date').annotate(sales=Count('id')).order_by('-orderedtime__date')[:30]
         datewiseCancelledOrders = orders.objects.values('orderedtime__date').annotate(status=Count('id',filter = Q(orderStatus = 'Cancelled'))).order_by('-orderedtime__date') [:30]
         datewiseDeliveredOrders = orders.objects.values('orderedtime__date').annotate(status=Count('id',filter = Q(orderStatus = 'Delivered'))).order_by('-orderedtime__date') [:30]
@@ -35,7 +35,7 @@ def adminhome(request):
             for o in order:
                 if c.category == o.pid.category_id.category:
                     count += 1
-                    catrevenue += (o.amount - o.less)
+                    catrevenue += o.calcfinalamt()
             categorysales.append(count)
             categoryrevenue.append(catrevenue)
         # print(categorysales)
@@ -498,7 +498,7 @@ def downloadsalesreport(request):
             if t == 'view':
                 return salesreport
             elif t == 'download':
-                filename = "attachment; filename=Invoice{}.pdf".format(0)
+                filename = "attachment; filename=Report{}.pdf".format(0)
                 salesreport['Content-Disposition'] = filename
                 return salesreport
     else:
@@ -509,21 +509,135 @@ def salesreport(request):
     if validationadmin(request):
         userid = request.session['id']
         name = neonlogin.objects.get(id = userid).name
-        return render(request,'admin/salesreport.html',{'name':name})        
+        o = orders.objects.filter(orderStatus = "Delivered").order_by('orderedtime')
+        return render(request,'admin/salesreport.html',{'name':name,'orders':o})        
     else:
         return redirect('/login/')
 
+import xlwt
+from docx import Document
+import io
 def genreport(request):
     if validationadmin(request):
-        fromdate = parse_date(request.GET.get('from'))
-        todate = parse_date(request.GET.get('to'))
-        if fromdate > todate:
-            return HttpResponse("Select a Valid Date Range")
+        if request.GET.get('val'):
+            if request.GET.get('val') == 'monthly':
+                CancelledOrders = orders.objects.values('orderedtime__month').annotate(amount=Sum('amount',filter = Q(orderStatus = 'Cancelled'))).order_by('-orderedtime__month')
+                DeliveredOrders = orders.objects.values('orderedtime__month').annotate(amount=Sum('amount',filter = Q(orderStatus = 'Delivered'))).order_by('-orderedtime__month')
+            elif request.GET.get('val') == 'yearly':
+                CancelledOrders = orders.objects.values('orderedtime__year').annotate(amount=Sum('amount',filter = Q(orderStatus = 'Cancelled'))).order_by('-orderedtime__year')
+                DeliveredOrders = orders.objects.values('orderedtime__year').annotate(amount=Sum('amount',filter = Q(orderStatus = 'Delivered'))).order_by('-orderedtime__year')
+            if CancelledOrders == None and DeliveredOrders == None:
+                CancelledOrders = None
+                DeliveredOrders = None
+            v = request.GET.get('val')
+            return render(request,'admin/genreport.html',{'corders':CancelledOrders,'dorders':DeliveredOrders,'val':v})
+
         else:
-            print((todate-fromdate).days)            
-            o = orders.objects.filter(orderedtime__lte = todate).filter(orderedtime__gte = fromdate).filter(orderStatus = "Delivered").order_by('orderedtime')
-            if o == None:
-                o = None
-            return render(request,'admin/genreport.html',{'orders':o})
+            fromdate = parse_date(request.GET.get('from'))
+            todate = parse_date(request.GET.get('to'))
+            if fromdate > todate:
+                return HttpResponse("Select a Valid Date Range")
+            elif request.GET.get('doctype') is not None:
+                doctype = request.GET.get('doctype')
+                o = orders.objects.filter(orderedtime__lte = todate).filter(orderedtime__gte = fromdate).filter(orderStatus = "Delivered").order_by('orderedtime')
+                #PDF download
+                if doctype == 'pdf':
+                    salesreport = render_to_pdf('downloads/reports.html',{'orderobj':o})
+                    if salesreport:
+                        filename = "attachment; filename=SalesReport From{0} to {1}.pdf".format(fromdate,todate)
+                        salesreport['Content-Disposition'] = filename
+                        return salesreport
+
+                #Excel Download
+                elif doctype == 'excel':
+                    response = HttpResponse(content_type='application/ms-excel')
+                    Efilename = "attachment; filename=SalesReport From{0} to {1}.xls".format(fromdate,todate)
+                    response['Content-Disposition'] = Efilename
+
+                    wb = xlwt.Workbook(encoding='utf-8')
+                    ws = wb.add_sheet('Sales Report') # this will make a sheet named Users Data
+
+                    # Sheet header, first row
+                    row_num = 0
+
+                    font_style = xlwt.XFStyle()
+                    font_style.font.bold = True
+
+                    columns = ['Item', 'Price', 'Quantity', 'Sub Total', 'Payment Method', 'Payment Id' ]
+
+                    for col_num in range(len(columns)):
+                        ws.write(row_num, col_num, columns[col_num], font_style) # at 0 row 0 column 
+
+                    # Sheet body, remaining rows
+                    font_style = xlwt.XFStyle()
+
+                    # rows = o.values_list('pid_id', 'amount', 'quantity', 'less', 'paymentMethod', 'paymentId')
+                    # print(rows)
+                    rows = []
+                    for ord in o:
+                        rows.append((ord.pid.name,ord.amount,ord.quantity,ord.quantity*ord.calcfinalamt(),ord.paymentMethod,ord.paymentMethod))
+                    for row in rows:
+                        row_num += 1
+                        for col_num in range(len(row)):
+                            ws.write(row_num, col_num, row[col_num], font_style)
+
+                    wb.save(response)
+
+                    return response
+                
+                #Doc Download
+                elif doctype == 'doc':
+                    # create an empty document object
+                    document = Document()
+                    document.add_heading("SalesReport From{0} to {1}".format(fromdate,todate))
+
+                    items = []
+                    for ord in o:
+                        items.append((ord.pid.name,ord.amount,ord.quantity,ord.quantity*ord.calcfinalamt(),ord.paymentMethod,ord.paymentMethod))
+                    table = document.add_table(len(items),6)
+
+                    th = table.rows[0].cells
+                    th[0].text = 'Item'
+                    th[1].text = 'Price'
+                    th[2].text = 'Quantity'
+                    th[3].text = 'Sub Total'
+                    th[4].text = 'Payment Method'
+                    th[5].text = 'Payment Id'
+
+                    for item in o:
+                        cells = table.add_row().cells
+                        cells[0].text = str(item.pid.name)
+                        cells[1].text = str(item.amount)
+                        cells[2].text = str(item.quantity)
+                        cells[3].text = str(item.quantity * item.calcfinalamt())
+                        cells[4].text = str(item.paymentMethod)
+                        cells[5].text = str(item.paymentId)
+
+                    table.style = 'LightShading-Accent1'
+
+                    # save document info
+                    buffer = io.BytesIO()
+                    document.save(buffer)  # save your memory stream
+                    buffer.seek(0)  # rewind the stream
+
+                    # put them to streaming content response 
+                    # within docx content_type
+                    response = StreamingHttpResponse(
+                        streaming_content=buffer,  # use the stream's content
+                        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    )
+                    Dfilename = "attachment; filename=SalesReport From{0} to {1}.docx".format(fromdate,todate)
+                    response['Content-Disposition'] = Dfilename
+                    response["Content-Encoding"] = 'UTF-8'
+
+                    return response
+                else:
+                    return redirect('/')
+            else:
+                print((todate-fromdate).days)            
+                o = orders.objects.filter(orderedtime__lte = todate).filter(orderedtime__gte = fromdate).filter(orderStatus = "Delivered").order_by('orderedtime')
+                if o == None:
+                    o = None
+                return render(request,'admin/genreport.html',{'orders':o})
     else:
         return redirect('/login/')
