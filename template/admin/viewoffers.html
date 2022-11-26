@@ -1,22 +1,20 @@
 {% extends 'admin/base.html' %}
-{% block viewcoupen %}
+{% block viewoffer %}
 active
 {% endblock %}
 
 
 {% block content %}
 
+<!-- Category offers -->
 <div class="col-sm-12 col-xl-12">
     <div class="bg-light rounded h-100 p-4">
-        <h6 class="mb-4">Categories</h6>
+        <h6 class="mb-4">Category Offers</h6>
         <table class="table table-hover">
             <thead>
                 <tr>
                     <th scope="col">
-                        Offer For Product/Category
-                    </th>
-                    <th scope="col">
-                        Offer detail
+                        Category
                     </th>
                     <th scope="col">
                         Offer Percentage
@@ -31,15 +29,8 @@ active
             </thead>
             <tbody>
                 {% for i in offers %}
+                {% if i.catid %}
                 <tr>
-                    <td class="pt-4">
-                        {% if i.catid %}
-                        Category
-                        {% endif %}
-                        {% if i.pid %}
-                        Product
-                        {% endif %}
-                    </td>
                     <td class="pt-4">
                         {% if i.catid %}
                         {{ i.catid.category }}
@@ -59,6 +50,60 @@ active
                         </form>
                     </td>
                 </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!--Product offers -->
+
+<div class="col-sm-12 col-xl-12">
+    <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Product Offers</h6>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        Product
+                    </th>
+                    <th scope="col">
+                        Offer Percentage
+                    </th>
+                    <th scope="col">
+                        Offer Maximum Limit
+                    </th>
+                    <th scope="col">
+                        Delete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in offers %}
+                {% if i.pid %}
+                <tr>
+                    <td class="pt-4">
+                        {% if i.catid %}
+                        {{ i.catid.category }}
+                        {% endif %}
+                        {% if i.pid %}
+                        {{ i.pid.name }}
+                        {% endif %}
+                    </td>
+                    <td class="pt-4">{{ i.offer }}%</td>
+                    <td class="pt-4">₹{{ i.max_limit }}</td>
+                    <td>
+                        <form id="delcoupen" class="delcoupen" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="oid" value="{{ i.id }}" hidden>
+                            <button type="submit" onclick="return confirmation()" class="btn btn-danger m-2">
+                                Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
