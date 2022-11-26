@@ -34,12 +34,18 @@ Neon | Checkout
 </style>
 
 <div class="row" id="b" style="margin:8rem 5rem;">
-
+    
     <div class="container p-2 px-5" id="addressselection" style="
     border: 2px solid white;border-radius: 10px;box-shadow: -4px 1px 20px 2px gray;">
         <h3>Select Delivery Address</h4>
-    </div>
-    <div class="form-check">
+        </div>
+        {% if not a %}
+        <div class="container pt-4">
+            <h4>You Dont Have Saved Address, Add address</h4>
+        </div>
+        {% endif %}
+    <div class="mt-3 container"><a class="btn btn-primary" href="/user/myaddress/"> Add Address </a></div>
+    <div class="container form-check">
         {% for address in a %}
 
         <label class="form-check-label" for="address{{forloop.counter}}">
@@ -59,8 +65,8 @@ Neon | Checkout
             value="{{ address.id }}" onclick="addressid({{ address.id }},inputlabel{{forloop.counter}})" hidden>
         {% endfor %}
     </div>
+    
     <br>
-    <small><a href="/user/myaddress/"> Add Address </a></small>
 
     <div class="container p-2 px-5" style="
     border: 2px solid white;border-radius: 10px;box-shadow: -4px 1px 20px 2px gray;">
