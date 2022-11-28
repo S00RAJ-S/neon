@@ -384,6 +384,7 @@ def userordercreation(request):
                     ShippingAddress = address(ad),
                     orderStatus = "Order Placed",
                     amount = amt,
+                    orderedtime = datetime.now(),
                     discounts = coupenobj,
                     less = discountamt
                     ).save()

@@ -49,7 +49,7 @@ class orders(models.Model):
     ShippingAddress = models.ForeignKey(address,on_delete = models.DO_NOTHING)
     orderStatus = models.CharField(max_length = 60)
     amount = models.FloatField()
-    orderedtime = models.DateTimeField(default = timezone.now(), blank=True)
+    orderedtime = models.DateTimeField(default = datetime.now(), blank=True)
     discounts = models.ForeignKey(coupens,on_delete = models.DO_NOTHING,default = '',null = True)
     less = models.FloatField(default = 0,blank =True)
 
