@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'neonadmin',
     'neonuser',
     'RazorpayIntegration',
+    'paypalapp',
     'mytags',
 ]
 

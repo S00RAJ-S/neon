@@ -24,6 +24,19 @@ Neon | Checkout
 {% endblock %}
 
 {% block content %}
+<script id="paypalscript" src="https://js.braintreegateway.com/web/dropin/1.33.7/js/dropin.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.88.4/js/paypal-checkout.min.js"></script>
+
+<script src="https://js.braintreegateway.com/web/3.88.4/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.88.4/js/paypal-checkout.min.js"></script>
+
+<script src="https://js.braintreegateway.com/web/3.88.4/js/google-payment.min.js"></script>
+<script src="https://pay.google.com/gp/p/js/pay.js"></script>
+
+<!-- device data collection-->
+<script src="https://js.braintreegateway.com/web/3.88.4/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.88.4/js/data-collector.min.js"></script>
+
 <style>
     .card:hover {
         background-color: white !important;
@@ -111,8 +124,8 @@ Neon | Checkout
 
     <div class="form-check m-5">
         <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="paypal"
-            onclick="paymentmethod('paypal')" hidden>
-        <label class="form-check-label" for="exampleRadios1" hidden>
+            onclick="paymentmethod('paypal')">
+        <label class="form-check-label" for="exampleRadios1">
             Paypal
         </label><br>
         <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="razorpay"
@@ -138,7 +151,56 @@ Neon | Checkout
 
 
 </div>
+  
+  <!-- Modal -->
+  <!-- <div class="modal fade" id="paypalmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Make Payment With Paypal</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="paypal-container"> -->
+          <!-- Paypal-->
+          <!-- <form id="payment-form" action="/" method="post">
+            <script id="paypalscript" src="https://js.braintreegateway.com/web/dropin/1.33.7/js/dropin.min.js"
+             data-paypal.flow="checkout"
+             data-paypal.amount="10.00"
+             data-paypal.currency="USD"
+             data-paypal-credit.flow="vault"
+            ></script> -->
+            <!--
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="rel()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
 
+    <!-- Modal -->
+    <div class="modal fade" id="paypalmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Make Payment With Paypal</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="paypal-container">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="makepaypalpayment">Make Payment</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" id="paypalclose" onclick="rel()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="paypal-button"></div>
+  <div id="paypl"></div>
 
 {% endblock %}
 {% block scripts %}
@@ -153,6 +215,9 @@ Neon | Checkout
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+    function rel(){
+        window.location.reload();
+    }
 
     //coupen
 
@@ -307,7 +372,108 @@ Neon | Checkout
                 // Payment Method 
                 if (PaymentMethod == 'paypal') {
                     // paymentlink = '/' //need to fill
-                    swal('-----------Order Placed with Paypal-------')
+                    // swal('-----------Order Placed with Paypal-------')
+                    document.getElementById('payment').setAttribute('data-toggle',"modal")
+                    document.getElementById('payment').setAttribute('data-target',"#paypalmodal")
+                    $.ajax({
+                        url:'/paypalpayment/',
+                        type:'POST',
+                        data:{
+                            csrfmiddlewaretoken:'{{ csrf_token }}',
+                            'price':p
+                        },
+                        success:function(res){
+                            $('#paypalscript').attr("data-braintree-dropin-authorization",res.client_token);  
+                                                      
+                            braintree.dropin.create({
+                                authorization: res.client_token,
+                                container: '#paypal-container',
+                                applePay: {
+                                        displayName: 'NEON E-Stores',
+                                        paymentRequest: {
+                                        total: {
+                                            label: 'Localized Name',
+                                            amount: (p*0.01368)/100
+                                        }
+                                        }
+                                    },
+                                paypal: {
+                                    flow: 'checkout',
+                                    amount: (p*0.01368)/100,
+                                    currency: 'USD',
+                                    
+                                },
+                                paypalCredit: {
+                                    flow: 'checkout',
+                                    amount: (p*0.01368)/100,
+                                    currency: 'USD',
+                                    
+                                    },
+                            }).then(function (dropinInstance) {
+                                document.getElementById('makepaypalpayment').addEventListener('click', function () {
+                                    $('#makepaypalpayment').text('Processing...')
+                                    $('#makepaypalpayment').attr("disabled", true);
+                                    $('#paypalclose').hide()
+                                dropinInstance.requestPaymentMethod().then(function (payload) {
+                                    // Send payload.nonce to your server
+                                    $.ajax({
+                                        url:'/paypalpayment/create_purchase/',
+                                        type:'POST',
+                                        data:{
+                                            csrfmiddlewaretoken:"{{ csrf_token }}",
+                                            'price':(p*0.01368)/100,
+                                            'nonce':payload.nonce
+                                        },
+                                        success:function(response){
+                                            // console.log(response.status)
+                                            // alert(response.status)
+                                            //Placing Order After Payment
+                                            swal({
+                                                icon: 'success',
+                                                title: "Order Placed Successfully",
+                                                text: "Payment of $" + ((p*0.01368)/100).toFixed(2) + "With Payment Id-" + response.paypal_payment_id
+                                            })
+                                                .then((val) => {
+                                                    $.ajax({
+                                                        url: '/user/ordercreation/',
+                                                        type: 'POST',
+                                                        data: {
+                                                            'paymentid': response.paypal_payment_id,
+                                                            'paymentmethod': PaymentMethod,
+                                                            'address': addressId,
+                                                            csrfmiddlewaretoken: '{{ csrf_token}}'
+                                                        },
+                                                        success: function (r) {
+                                                            // alert(r.response)
+                                                            window.location.href = '/user/myorders/'
+                                                        }
+                                                    })
+                                                })                                       
+                                        },
+                                        error:function(){
+                                            window.location.href = '/user/checkout/'
+                                        }
+                                    })
+                                }).catch(function (err) {
+                                    // Handle errors in requesting payment method
+                                    swal({
+                                        icon:'warning',
+                                        text:'Select a Payment Method'
+                                    })
+                                });
+                                });
+                            }).catch(function (err) {
+                                // Handle any errors that might've occurred when creating Drop-in
+                                swal(err)
+                            });
+                        },
+                        error:function(){
+                            swal({
+                                icon:'info',
+                                title:'Failed to make payment'
+                            })
+                        }
+                    });
                 }
                 else if (PaymentMethod == 'razorpay') {
                     swal({

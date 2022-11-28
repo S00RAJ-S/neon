@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import otpvalidation
 from RazorpayIntegration import urls as R
+from paypalapp import urls as P
 
 urlpatterns = [
     path('',views.landingpage),
@@ -33,6 +34,7 @@ urlpatterns = [
     path('loginv/',views.loginv),
     path('user/',include(u)),
     path('razorpay/',include(R)),
+    path('paypalpayment/',include(P)),
     path('validatetotp/',views.validatetotp),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
