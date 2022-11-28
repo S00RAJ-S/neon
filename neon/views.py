@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import *
-from neonuser.models import neonlogin
+from neonuser.models import neonlogin,guestcart
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from neon.encryption import decrypt
@@ -20,7 +20,11 @@ def landingpage(request):
         cat = categories.objects.all()
         pdt = products.objects.all()
         b = banner.objects.all()
-        return render(request,'landingpage.html',{"categories":cat,"products":pdt,"banner":b})
+        try:
+            cartcount = guestcart.objects.filter(uid = request.COOKIES['device']).count()
+        except:
+            cartcount = None
+        return render(request,'landingpage.html',{"categories":cat,"products":pdt,"banner":b,'cartcount':cartcount})
 
 @never_cache
 def myloginfn(request):
@@ -31,7 +35,8 @@ def myloginfn(request):
     else:
         return render(request,'login.html')
     
-    
+from .guestcart_to_cart import guestcart_to_cart
+
 def loginv(request):
     if request.method == 'POST':
             email = request.POST.get('email')
@@ -53,6 +58,7 @@ def loginv(request):
                         if d.twofa == "T":
                             return render(request,'user/entertotp.html')
                         else:
+                            guestcart_to_cart(request)
                             ret = redirect('/user/')
                             ret.set_cookie('email',email)
                             ret.set_cookie('epass',encryptedpassword)
@@ -76,6 +82,7 @@ def validatetotp(request):
         u = neonlogin.objects.get(email = e)
         totp = pyotp.TOTP(u.twofakey)
         if totp.verify(enteredTOTP):
+            guestcart_to_cart(request)
             ret = redirect('/user/')
             ret.set_cookie('email',e)
             ret.set_cookie('epass',p)

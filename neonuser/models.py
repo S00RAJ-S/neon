@@ -56,3 +56,10 @@ class orders(models.Model):
 
     def calcfinalamt(self):
         return (self.amount - self.less)
+
+#Guest Cart
+
+class guestcart(models.Model):
+    uid = models.CharField(max_length=250)
+    pid = models.ForeignKey(products,on_delete = models.CASCADE)
+    quantity = models.IntegerField(default = 1)

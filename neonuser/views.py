@@ -120,7 +120,21 @@ def AddToCart(request,productid):
             messages.success(request,"Product added to Cart")
         return redirect(request.META.get('HTTP_REFERER'))
     else:
-        return redirect('/login/')
+        try:
+            device = request.COOKIES['device']
+            try:
+                guestcart.objects.get(uid = device,pid = productid)
+                messages.warning(request,"Product Already Exist in Cart")
+            except: 
+                if products.objects.get(id = productid).stock < 1 :
+                    qty = 0
+                else:
+                    qty = 1
+                guestcart(uid = device, pid = products(productid),quantity = qty).save()
+                messages.success(request,"Product added to Cart")
+            return redirect(request.META.get('HTTP_REFERER'))
+        except:
+            return redirect('/login/')
 
 @never_cache
 def Cart(request):
@@ -155,7 +169,36 @@ def Cart(request):
             ret = redirect('/user/')
         return ret
     else:
-        return redirect('/login/')
+        try:
+            device = request.COOKIES['device']
+            try:
+                c = guestcart.objects.filter(uid = device)
+                gcartcount = c.count()
+                gprice = 0
+                for i in c:
+                    gstock = i.pid.stock
+                    if i.quantity > gstock:
+                        guestcart.objects.filter(id = i.id).update(quantity = gstock)
+                    # print(i.pid.calcofferprice())
+                    try:
+                        gprice += round((i.pid.calcofferprice() * i.quantity),2)
+                    except:
+                        gprice += (i.pid.price * i.quantity)
+                if gcartcount == 0:
+                    raise Exception("Cart is Empty")
+                else:
+                    if gprice > 500:
+                        gs = 0
+                    else:
+                        gs = 40
+                    availablecoupens = coupens.objects.all()
+                    ret = render(request,"user/cart.html",{"w":c,"cartcount":gcartcount,"price":gprice,"total":gprice+gs,"s":gs,'coupens':availablecoupens})
+            except Exception as e: 
+                messages.info(request,e)
+                ret = redirect('/')
+            return ret
+        except:
+            return redirect('/login/')
 
 def DelCart(request):
     if validationusr(request):
@@ -168,7 +211,16 @@ def DelCart(request):
                 messages.info(request,"Sorry")
             return redirect('/user/cart/')
     else:
-        return redirect('/login/')
+        if request.method == 'POST':
+            gcartid = request.POST.get('delid')
+            try:
+                guestcart.objects.get(id = gcartid).delete()
+                messages.success(request,"Product deleted from Cart")
+            except:
+                messages.info(request,"Sorry")
+            return redirect('/user/cart/')
+        else:
+            return redirect('/login/')
 
 def updateqty(request):
     if validationusr(request):
@@ -206,6 +258,38 @@ def updateqty(request):
                         qty +=1
             cart.objects.filter(id = q).update(quantity = qty)
             c = cart.objects.filter(uid = userid)
+            price = 0
+            for i in c:
+                if i.pid.calcofferprice():
+                    price += round((i.pid.calcofferprice() * i.quantity),2)
+                else:
+                    price += round((i.pid.price * i.quantity),2)
+            if price > 500:
+                s = 0
+            else:
+                s = 40
+        return JsonResponse({'qty':qty,'price':price,'s':s})
+    else:
+        device = request.COOKIES['device']
+        o = int(request.POST.get('o'))
+        q = request.POST.get('pdtid')
+        pid = guestcart.objects.get(id = q).pid
+        stok = pid.stock
+        if stok < 1:
+            qty = 0
+        else:
+            if o == 0:
+                qty = guestcart.objects.get(id = q).quantity
+                if qty > 1:
+                    c = guestcart.objects.filter(uid = device)
+                    qty -=1
+            elif o == 1:
+                qty = guestcart.objects.get(id = q).quantity
+                if stok > qty:
+                    c = guestcart.objects.filter(uid = device)
+                    qty +=1
+            guestcart.objects.filter(id = q).update(quantity = qty)
+            c = guestcart.objects.filter(uid = device)
             price = 0
             for i in c:
                 if i.pid.calcofferprice():
@@ -471,13 +555,17 @@ def SinglePageProduct(request,pid):
         name = neonlogin.objects.get(id = userid).name
         cartcount = cart.objects.filter(uid = userid).count()
     except:
-        cartcount = False
+        try:
+            device = request.COOKIES['device']
+            cartcount = guestcart.objects.filter(uid = device).count()
+        except:
+            cartcount = None
         name = False
     try:
         pdt = products.objects.get(id = pid)
         return render(request,"user/Single-Product-Page.html",{"product":pdt,"cartcount":cartcount,"name":name})
     except:
-        return redirect('/')
+        return render(request,'404.html')
     # if request.method == "POST":
     #     cartid = request.POST.get('delid')
     #     try:
@@ -592,7 +680,11 @@ def search(request):
         user = neonlogin.objects.get(id = userid).name
         cartcount = cart.objects.filter(uid = userid).count()
     except:
-        cartcount = False
+        try:
+            device = request.COOKIES['device']
+            cartcount = guestcart.objects.filter(uid = device).count()
+        except:
+            cartcount = None
         user = False
     q = request.GET.get('query')
     cc = categories.objects.filter(Q(category__icontains = q))
