@@ -4,6 +4,7 @@ from twilio.rest import Client
 import random
 from neonuser.models import neonlogin
 from django.contrib import messages
+from .guestcart_to_cart import guestcart_to_cart
 
 # Find your Account SID and Auth Token in Account Info
 # and set the environment variables. See http://twil.io/secure
@@ -61,6 +62,7 @@ def valadatingotp(request):
                     ret.set_cookie('email',d.email)
                     ret.set_cookie('epass',d.password)
                 elif d.blocked == "F":
+                    guestcart_to_cart(request)
                     ret = redirect('/user/')
                     ret.set_cookie('email',d.email)
                     ret.set_cookie('epass',d.password)
