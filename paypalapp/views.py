@@ -1,17 +1,18 @@
 from django.shortcuts import *
 from django.http import JsonResponse
-import braintree
+import braintree,os,dotenv
 from django.contrib import messages
 
+dotenv.read_dotenv()
 
 def paypalorderidgen(request):
     if request.method == 'POST':
         gateway = braintree.BraintreeGateway(
         braintree.Configuration(
             braintree.Environment.Sandbox,
-            merchant_id="gqxpzs6zydhzgrqf",
-            public_key="3m8jxf6sfg6hhdd7",
-            private_key="0f6f0bdeced9eda6330992486b18bdb7"
+            merchant_id=os.environ.get('merchant_id'),
+            public_key=os.environ.get('public_key'),
+            private_key=os.environ.get('private_key')
         )
         )
         # pass client_token to your front-end
@@ -23,7 +24,6 @@ def paypalorderidgen(request):
         client_token = gateway.client_token.generate({
             "customer_id": 472188472
         })
-        # print("hello")
         # print(type(client_token))
         return JsonResponse({'client_token':client_token})
     else:
@@ -37,9 +37,9 @@ def create_purchase(request):
         gateway = braintree.BraintreeGateway(
                 braintree.Configuration(
                     braintree.Environment.Sandbox,
-                    merchant_id="gqxpzs6zydhzgrqf",
-                    public_key="3m8jxf6sfg6hhdd7",
-                    private_key="0f6f0bdeced9eda6330992486b18bdb7"
+                    merchant_id=os.environ.get('merchant_id'),
+                    public_key=os.environ.get('public_key'),
+                    private_key=os.environ.get('private_key')
                 )
                 )
         result = gateway.transaction.sale({

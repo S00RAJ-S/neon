@@ -5,25 +5,18 @@ import random
 from neonuser.models import neonlogin
 from django.contrib import messages
 from .guestcart_to_cart import guestcart_to_cart
+import os
+import dotenv
 
-# Find your Account SID and Auth Token in Account Info
-# and set the environment variables. See http://twil.io/secure
-# account_sid = 'AC3fbf6eb6e3e9f5ccacfc98f8bab1c5ce'
-# auth_token = '97b33b574d5c95b22b5bac3bb1971c05'
-# client = Client(account_sid, auth_token)
-
-# message = client.messages.create(body='Hi there',from_='+19705008034',to='+918547455343')
-# print(message.sid)
-                    
-
+dotenv.read_dotenv()
 
 def sendotp(request):
     if request.method == "POST":
         try:
             ph = int(request.POST.get('phone'))
             neonlogin.objects.get(phone = ph)
-            account_sid = 'AC3fbf6eb6e3e9f5ccacfc98f8bab1c5ce'
-            auth_token = '97b33b574d5c95b22b5bac3bb1971c05'
+            account_sid = os.environ.get('account_sid')
+            auth_token = os.environ.get('auth_token')
             client = Client(account_sid, auth_token)
             otp = random.randint(1000,9999)
             request.session['otp'] = otp
