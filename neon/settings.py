@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+import dotenv
+
+dotenv.read_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&0(8aw3%7xegnmk-u7(2qcd*z4w_ja0v)mr&99)vj$v62obk%!'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG')
 
-ALLOWED_HOSTS = ["www.neon-e-store.tk","neon-e-store.tk","localhost"] 
-# ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -87,18 +89,12 @@ WSGI_APPLICATION = 'neon.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':'neon',
-        'HOST': 'localhost',
-        'USER':'sooraj',
-        'PASSWORD':'daP5My3cPy8Bpkj',
-        'PORT':''
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME':'neon',
-        # 'HOST':'localhost',
-        # 'USER':'postgres',
-        # 'PASSWORD':'sooraj',
-        # 'PORT':'5432'
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':os.environ.get('NAME'),
+        'HOST':os.environ.get('HOST'),
+        'USER':os.environ.get('USER'),
+        'PASSWORD':os.environ.get('PASSWORD'),
+        'PORT':os.environ.get('PORT')
     }
 }
 
@@ -151,7 +147,7 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ENCRYPT_KEY = b'2xLlDKl9QBAbRiXPRkcA-nLDiaH6NtF6D11zcW6Bavc='
+ENCRYPT_KEY = os.environ.get('ENCRYPT_KEY')
 CSRF_TRUSTED_ORIGINS = ["https://neon-e-store.tk","https://www.neon-e-store.tk"]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
